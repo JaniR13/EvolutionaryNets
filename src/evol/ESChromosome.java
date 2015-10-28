@@ -16,25 +16,31 @@ public class ESChromosome {
     private Double[][] varMatrix;
     //The rotation vector
     private Double[] rotationVector;//will be of length (n(n-1))/2 where n is number of features
-    //
+    //fitness
+    private double fitness;
     
     public ESChromosome(Chromosome c){
         this.c = c;
         //TODO: Initialize varMetrix and rotationVector
    }
    
-    public void mutateC(){
-        //TODO: vector xj (t+1) = element j in Chromosome at time t
-        //  + variance of element j at time t times N(0,1) (this is mutation)
+    public void evaluateFitness(){
         
     }
-    
-    public void recombineC(){
-        //TODO: Decide on Uniform or Intermediate Crossover and implement
+    public Double[][] getVarMatrix(){
+        return varMatrix;
+    }
+    public Double[] getRotVector(){
+        return rotationVector;
+    }
+    public double getFitness(){
+        return fitness;
+    }
+    public void setVarMatrix(Double[][] varMatrix){
+        this.varMatrix = varMatrix;
+    }
+    public void getRotVector(Double[] rotationVector){
+        this.rotationVector = rotationVector;
     }
     
-    public void mutateParams(){
-        //TODO: sigma j at time t + 1 = sigma j at time t * 
-        //      e^(overal tau * some number + this tau * some number)
-    }
 }
