@@ -40,7 +40,7 @@ public class ESChromosome {
     public void setVarMatrix(Double[] varMatrix){
         this.varMatrix = varMatrix;
     }
-    public int getVarMatrixSize(){
+    public int getNumGenes(){
         return c.getNumGenes();
     }
     public Double getVar(int i){

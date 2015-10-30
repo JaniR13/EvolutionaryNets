@@ -32,7 +32,8 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.lambda = lambda;
         this.mu = mu;
         this.rho = rho;
-        this.gens = gens;   
+        this.gens = gens;
+        
     }
 
     protected void initPop() {
@@ -40,11 +41,11 @@ public class EvolutionStrategy extends TrainingStrategy {
             ESChromosome es = new ESChromosome(new Chromosome(net));
             pop.add(es);
         }
+        numGenes = pop.get(0).getNumGenes();
     }
 
     public void run() {
         initPop();
-        numGenes = pop.get(0).getVarMatrixSize();
         ESChromosome[] pool = new ESChromosome[rho];
         // runs for specified number of generations
         for (int g = 0; g < gens; g++) {
