@@ -21,20 +21,30 @@ public class EvolutionStrategy extends TrainingStrategy {
     // neural net to train
     private FeedForwardANN net;
     private Random rand = new Random();
+    private int numGenes;
+
     /**
-     * Each member of the population will need: a Chromosome, a rotation vector,
+     * Each member of the population will need: a Chromosome, and 
      * a variance matrix
      */
-    public EvolutionStrategy() {
-
+    public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens) {
+        this.net = net;
+        this.lambda = lambda;
+        this.mu = mu;
+        this.rho = rho;
+        this.gens = gens;   
     }
 
     protected void initPop() {
-        //TODO initialize the population
+        for (int i = 0; i < mu; i++){
+            ESChromosome es = new ESChromosome(new Chromosome(net));
+            pop.add(es);
+        }
     }
 
     public void run() {
         initPop();
+        numGenes = pop.get(0).getVarMatrixSize();
         ESChromosome[] pool = new ESChromosome[rho];
         // runs for specified number of generations
         for (int g = 0; g < gens; g++) {
@@ -43,8 +53,8 @@ public class EvolutionStrategy extends TrainingStrategy {
                 ESChromosome yl = new ESChromosome(new Chromosome(net));
                 pool = marriage(pool);
 
-                yl = recombineParams(pool);
-                yl = recombineC(pool);
+                yl = recombineParams(pool, yl);
+                yl = recombineC(pool, yl);
 
                 yl = mutateParams(yl);
                 yl = mutateC(yl);
@@ -62,7 +72,7 @@ public class EvolutionStrategy extends TrainingStrategy {
             int lowIndex = 0;
             for (int j = 1; j < pop.size(); j++) {
                 double curFit = pop.get(j).getFitness();
-                if(curFit < lowfit){
+                if (curFit < lowfit) {
                     lowIndex = j;
                     lowfit = curFit;
                 }
@@ -72,38 +82,45 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome[] marriage(ESChromosome[] pool) {
-        //TODO figure out selection
+        for(int i = 0; i < rho; i++){
+            pool[i] = pop.get(rand.nextInt(mu));
+        }
         return pool;
     }
 
     private ESChromosome mutateC(ESChromosome start) {
-        //TODO: vector xj (t+1) = element j in Chromosome at time t
-        //  + variance of element j at time t times N(0,1) (this is mutation)
+        Double[] newGenes = start.getGenes();
+        for (int i = 0; i < numGenes; i++) {
+            newGenes[i] += start.getVar(i) * rand.nextGaussian();
+        }
+        start.setGenes(newGenes);
         return start;
     }
 
-    private ESChromosome recombineC(ESChromosome[] pool) {
-        //TODO: Decide on Uniform or Intermediate Crossover and implement
-        return pool[0];
+    private ESChromosome recombineC(ESChromosome[] pool, ESChromosome child) {
+        for (int i = 0; i < numGenes; i++) {
+            child.setGene(i, pool[rand.nextInt(rho)].getGene(i));
+        }
+        return child;
     }
 
     private ESChromosome mutateParams(ESChromosome start) {
-        Double[][] newVar = start.getVarMatrix();
-        //initialize newVar
-        for(int i = 0; i < start.getVarMatrixSize(); i++){
+        Double[] newVar = start.getVarMatrix();
+        for (int i = 0; i < numGenes; i++) {
             double r1 = rand.nextGaussian();
             double r2 = rand.nextGaussian();
-            newVar[i][i] = (newVar[i][i]*Math.exp((tauOverall*r1)  + (tauInd*r2)));
+            newVar[i] = (newVar[i] * Math.exp((tauOverall * r1) + (tauInd * r2)));
         }
-        //TODO: sigma j at time t + 1 = sigma j at time t * 
-        //      e^(overal tau * some number + this tau * some number)
         start.setVarMatrix(newVar);
         return start;
     }
 
-    private ESChromosome recombineParams(ESChromosome[] pool) {
-        //TODO make this method do machine learning things
-        return pool[0];
+    private ESChromosome recombineParams(ESChromosome[] pool, ESChromosome child) {
+        for (int i = 0; i < numGenes; i++) {
+            child.setVar(i, pool[rand.nextInt(rho)].getVar(i));
+        }
+        return child;
+
     }
 
     public void setGens(int gens) {
@@ -139,7 +156,8 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     public void setTau() {
-
+        tauOverall = 1/Math.sqrt(2*mu);
+        tauInd = 1/Math.sqrt(2*Math.sqrt(mu));
     }
 
     public double getTauInd() {

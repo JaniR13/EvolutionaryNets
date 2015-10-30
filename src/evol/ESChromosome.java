@@ -5,6 +5,8 @@
  */
 package evol;
 
+import java.util.Random;
+
 /**
  *
  * @author Janette
@@ -13,38 +15,53 @@ public class ESChromosome {
     //Class holds a Chromosome c, and the strategy parameters for each Chromosome
     private Chromosome c;
     //variance array for the chromosome
-    private Double[][] varMatrix;
-    //The rotation vector
-    private Double[] rotationVector;//will be of length (n(n-1))/2 where n is number of features
-    private double fitness;
+    private Double[] varMatrix;
+    private Random rand = new Random();
     
     public ESChromosome(Chromosome c){
         this.c = c;
-        //TODO: Initialize varMetrix and rotationVector
+        int numGenes = c.getNumGenes();
+        varMatrix = new Double[numGenes];
+        //initialize variance to random Gaussian
+        for(int i = 0; i < numGenes; i++){
+            varMatrix[i] = rand.nextGaussian();
+        }
    }
    
     public void evaluateFitness(){
         c.evaluate();
     }
-    public Double[][] getVarMatrix(){
+    public Double[] getVarMatrix(){
         return varMatrix;
-    }
-    public Double[] getRotVector(){
-        return rotationVector;
     }
     public double getFitness(){
         return c.getFitness();
     }
-    public void setVarMatrix(Double[][] varMatrix){
+    public void setVarMatrix(Double[] varMatrix){
         this.varMatrix = varMatrix;
-    }
-    public void getRotVector(Double[] rotationVector){
-        this.rotationVector = rotationVector;
     }
     public int getVarMatrixSize(){
         return c.getNumGenes();
     }
+    public Double getVar(int i){
+        return varMatrix[i];
+    }
+    public void setVar(int i, double var){
+        varMatrix[i] = var;
+    }
+    public Double[] getGenes(){
+        return c.getGenes();
+    }
+    public Double getGene(int i){
+        return c.getGene(i);
+    }
     
-    
-    
+    public void setGenes(Double[] newGenes){
+        for(int i = 0; i < newGenes.length; i++){
+            c.setGene(i, newGenes[i]);
+        }
+    }
+    public void setGene(int i, double gene){
+        c.setGene(i, gene);
+    }
 }
