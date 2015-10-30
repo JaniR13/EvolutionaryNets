@@ -1,6 +1,7 @@
 package evol;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class EvolutionStrategy extends TrainingStrategy {
 
@@ -19,7 +20,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     private double tauInd;
     // neural net to train
     private FeedForwardANN net;
-
+    private Random rand = new Random();
     /**
      * Each member of the population will need: a Chromosome, a rotation vector,
      * a variance matrix
@@ -37,14 +38,14 @@ public class EvolutionStrategy extends TrainingStrategy {
         ESChromosome[] pool = new ESChromosome[rho];
         // runs for specified number of generations
         for (int g = 0; g < gens; g++) {
-            
+
             for (int l = 0; l < lambda; l++) {
                 ESChromosome yl = new ESChromosome(new Chromosome(net));
                 pool = marriage(pool);
-                
+
                 yl = recombineParams(pool);
                 yl = recombineC(pool);
-                
+
                 yl = mutateParams(yl);
                 yl = mutateC(yl);
                 yl.evaluateFitness();
@@ -53,31 +54,54 @@ public class EvolutionStrategy extends TrainingStrategy {
             prunePop(lambda);
         }
     }
-    private void prunePop(int pruneBy){
-        //TODO make this method go
+
+    private void prunePop(int pruneBy) {
+
+        for (int i = 0; i < pruneBy; i++) {
+            double lowfit = pop.get(0).getFitness();
+            int lowIndex = 0;
+            for (int j = 1; j < pop.size(); j++) {
+                double curFit = pop.get(j).getFitness();
+                if(curFit < lowfit){
+                    lowIndex = j;
+                    lowfit = curFit;
+                }
+            }
+            pop.remove(lowIndex);
+        }
     }
-    public ESChromosome[] marriage(ESChromosome[] pool) {
+
+    private ESChromosome[] marriage(ESChromosome[] pool) {
         //TODO figure out selection
         return pool;
     }
 
-    public ESChromosome mutateC(ESChromosome start) {
+    private ESChromosome mutateC(ESChromosome start) {
         //TODO: vector xj (t+1) = element j in Chromosome at time t
         //  + variance of element j at time t times N(0,1) (this is mutation)
         return start;
     }
 
-    public ESChromosome recombineC(ESChromosome[] pool) {
+    private ESChromosome recombineC(ESChromosome[] pool) {
         //TODO: Decide on Uniform or Intermediate Crossover and implement
         return pool[0];
     }
 
-    public ESChromosome mutateParams(ESChromosome start) {
+    private ESChromosome mutateParams(ESChromosome start) {
+        Double[][] newVar = start.getVarMatrix();
+        //initialize newVar
+        for(int i = 0; i < start.getVarMatrixSize(); i++){
+            double r1 = rand.nextGaussian();
+            double r2 = rand.nextGaussian();
+            newVar[i][i] = (newVar[i][i]*Math.exp((tauOverall*r1)  + (tauInd*r2)));
+        }
         //TODO: sigma j at time t + 1 = sigma j at time t * 
         //      e^(overal tau * some number + this tau * some number)
+        start.setVarMatrix(newVar);
         return start;
     }
-    public ESChromosome recombineParams(ESChromosome[] pool){
+
+    private ESChromosome recombineParams(ESChromosome[] pool) {
         //TODO make this method do machine learning things
         return pool[0];
     }

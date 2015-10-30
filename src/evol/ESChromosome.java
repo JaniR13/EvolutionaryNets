@@ -16,7 +16,6 @@ public class ESChromosome {
     private Double[][] varMatrix;
     //The rotation vector
     private Double[] rotationVector;//will be of length (n(n-1))/2 where n is number of features
-    //fitness
     private double fitness;
     
     public ESChromosome(Chromosome c){
@@ -25,7 +24,7 @@ public class ESChromosome {
    }
    
     public void evaluateFitness(){
-        
+        c.evaluate();
     }
     public Double[][] getVarMatrix(){
         return varMatrix;
@@ -34,7 +33,7 @@ public class ESChromosome {
         return rotationVector;
     }
     public double getFitness(){
-        return fitness;
+        return c.getFitness();
     }
     public void setVarMatrix(Double[][] varMatrix){
         this.varMatrix = varMatrix;
@@ -42,5 +41,10 @@ public class ESChromosome {
     public void getRotVector(Double[] rotationVector){
         this.rotationVector = rotationVector;
     }
+    public int getVarMatrixSize(){
+        return c.getNumGenes();
+    }
+    
+    
     
 }
