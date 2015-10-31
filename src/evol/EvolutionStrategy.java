@@ -24,8 +24,8 @@ public class EvolutionStrategy extends TrainingStrategy {
     private int numGenes;
 
     /**
-     * Each member of the population will need: a Chromosome, and 
-     * a variance matrix
+     * Each member of the population will need: a Chromosome, and a variance
+     * matrix
      */
     public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens) {
         this.net = net;
@@ -36,15 +36,15 @@ public class EvolutionStrategy extends TrainingStrategy {
         
     }
 
-    protected void initPop() {
-        for (int i = 0; i < mu; i++){
+    private void initPop() {
+        for (int i = 0; i < mu; i++) {
             ESChromosome es = new ESChromosome(new Chromosome(net));
             pop.add(es);
         }
         numGenes = pop.get(0).getNumGenes();
     }
 
-    public void run() {
+    public ESChromosome run() {
         initPop();
         ESChromosome[] pool = new ESChromosome[rho];
         // runs for specified number of generations
@@ -64,8 +64,20 @@ public class EvolutionStrategy extends TrainingStrategy {
             }
             prunePop(lambda);
         }
+        return returnBest();
     }
-
+    private ESChromosome returnBest(){
+        double highFit = pop.get(0).getFitness();
+        int highIndex = 0;
+        for(int i = 0; i < pop.size(); i++){
+            double curFit = pop.get(i).getFitness();
+            if(curFit > highFit){
+                highIndex = i;
+                highFit = curFit;
+            }
+        }
+        return pop.get(highIndex);
+    }
     private void prunePop(int pruneBy) {
 
         for (int i = 0; i < pruneBy; i++) {
@@ -83,7 +95,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome[] marriage(ESChromosome[] pool) {
-        for(int i = 0; i < rho; i++){
+        for (int i = 0; i < rho; i++) {
             pool[i] = pop.get(rand.nextInt(mu));
         }
         return pool;
@@ -157,8 +169,8 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     public void setTau() {
-        tauOverall = 1/Math.sqrt(2*mu);
-        tauInd = 1/Math.sqrt(2*Math.sqrt(mu));
+        tauOverall = 1 / Math.sqrt(2 * mu);
+        tauInd = 1 / Math.sqrt(2 * Math.sqrt(mu));
     }
 
     public double getTauInd() {
