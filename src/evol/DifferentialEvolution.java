@@ -11,6 +11,7 @@ public class DifferentialEvolution extends TrainingStrategy {
     private FeedForwardANN net;
     private ArrayList <Chromosome> pop = new ArrayList<Chromosome>();
     private Random rand = new Random();
+    private int numGenes;
     
     public DifferentialEvolution(){
         
@@ -35,13 +36,31 @@ public class DifferentialEvolution extends TrainingStrategy {
     }
     
     private void initPop(){
+        numGenes = pop.get(0).getNumGenes();
         
     }
     private Chromosome mutation(Chromosome child, Chromosome parent){
-        return parent;
-    }
-    private Chromosome crossover(Chromosome child, Chromosome parent){
+        Chromosome p2 = pop.get(rand.nextInt(popSize));
+        Chromosome p3 = pop.get(rand.nextInt(popSize));
+        for(int i = 0; i < numGenes; i++){
+            double adj = parent.getGene(i)+ beta*(p2.getGene(i) - p3.getGene(i));
+            child.setGene(i, adj);
+        }
         return child;
+    }
+    private Chromosome crossover(Chromosome child, Chromosome parent){//Binomial crossover
+        Chromosome child1 = new Chromosome(net);
+        int jstar = rand.nextInt(numGenes);
+        child1.setGene(jstar, child.getGene(jstar));
+        for(int j = 1; j < numGenes; j++){
+            double rando = rand.nextDouble();
+            if(rando < pr && j != jstar){
+                child1.setGene(j, child.getGene(j));
+            }else{
+                child1.setGene(j, parent.getGene(j));
+            }
+        }
+        return child1;
     }
     private Chromosome returnBest(){
         double highFit = pop.get(0).getFitness();
