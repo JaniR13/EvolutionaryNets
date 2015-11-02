@@ -64,18 +64,24 @@ public class RunModels {
             // starts building the file path
             String filePathTrain = home;
             String filePathTest = home;
+            String keyWord = "";
+            //String to hold the filepath of the entire dataset
+            String filePathOut = "";
 
             // uses file separator so is operating system agnostic
             if (os.startsWith("windows")) { // Windows
                 filePathTrain += File.separator;
                 filePathTest += File.separator;
+                filePathOut += File.separator;
             } else if (os.startsWith("mac")) { // Mac
                 filePathTrain += File.separator;
                 filePathTest += File.separator;
+                filePathOut += File.separator;
             } else {
                 // everything else
                 filePathTrain += File.separator;
                 filePathTest += File.separator;
+                filePathOut += File.separator;
             }
 
             // calls the file chooser, returns the updated file path
@@ -86,7 +92,16 @@ public class RunModels {
             filePathTest = callFileChooser(filePathTest);
             System.out.println("Test Data: " + filePathTest);
 
-            //FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest);
+            System.out.println("Enter the keyword you would like to use to label your output files.");
+            keyWord = in.nextLine();
+
+            System.out.println("Select location where you would like to save your output files.");
+            filePathOut = getFileLocation();
+            filePathOut += File.separator + keyWord + "Out.txt";
+                    
+            System.out.println("Output Data: " + filePathOut);
+            
+            FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut);
         } else {
             System.exit(0);
         }
@@ -98,7 +113,7 @@ public class RunModels {
     public static String callFileChooser(String filePath) {
         // builds a JFrame
         JFrame frame = new JFrame("Folder Selection Pane");
-        frame.setAlwaysOnTop (true);
+        frame.setAlwaysOnTop(true);
         // string to score the path
         String thisPath = "";
 
