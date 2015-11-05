@@ -7,261 +7,265 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Neuron {
+	//the selected activation function (can be linear or sigmoidal)
+	private ActivationFunction f;
+	private MeanSquaredError loss;
+	private ArrayList<Neuron> descendants = new ArrayList<Neuron>();
+	private ArrayList<Neuron> ancestors = new ArrayList<Neuron>();
+	private ArrayList<Double> inputs;
+	private ArrayList<Double> weights;
+	private double output = 0;
 
-    //the selected activation function (can be linear or sigmoidal)
+	private Double delta = 0.0;
+	private ArrayList<Double> delta_w = new ArrayList<Double>();
+	private ArrayList<Double> delta_w_prev = new ArrayList<Double>();
 
-    private ActivationFunction f;
-    private MeanSquaredError loss;
-    private ArrayList<Neuron> descendants = new ArrayList<Neuron>();
-    private ArrayList<Neuron> ancestors = new ArrayList<Neuron>();
-    private ArrayList<Double> inputs;
-    private ArrayList<Double> weights;
-    private double output = 0;
+	// these two only have meaning if it's part of a network
+	private int layer = 0;
+	private int depth = 0;
 
-    private Double delta = 0.0;
-    private ArrayList<Double> delta_w = new ArrayList<Double>();
-    private ArrayList<Double> delta_w_prev = new ArrayList<Double>();
+	// input has no ancestors
+	private boolean isInputNode = false;
+	// output has no descendants
+	private boolean isOutputNode = false;
+	private boolean isBias = false;
+	private int bias = 1;
 
-    // these two only have meaning if it's part of a network
-    private int layer = 0;
-    private int depth = 0;
+	/**
+	 * 
+	 * @param f
+	 *            activation function
+	 * @param layer
+	 *            layer where the neuron lives
+	 * @param depth
+	 *            depth in the layer where the neuron lives
+	 * @param numInputs
+	 *            number of inputs the neuron takes
+	 */
+	public Neuron(ActivationFunction f, int layer, int depth, int numInputs) {
+		this.f = f;
+		this.layer = layer;
+		this.depth = depth;
+		this.inputs = new ArrayList<Double>();
+		loss = new MeanSquaredError();
+		initializeWeights(numInputs);
+	}
 
-    // input has no ancestors
-    private boolean isInputNode = false;
-    // output has no descendants
-    private boolean isOutputNode = false;
-    private boolean isBias = false;
-    private int bias = 1;
+	private void initializeWeights(int numInputs) {
+		// creates random initial weights.
+		weights = new ArrayList<Double>();
 
-    /**
-     *
-     * @param f activation function
-     * @param layer layer where the neuron lives
-     * @param depth depth in the layer where the neuron lives
-     * @param numInputs number of inputs the neuron takes
-     */
-    public Neuron(ActivationFunction f, int layer, int depth, int numInputs) {
-        this.f = f;
-        this.layer = layer;
-        this.depth = depth;
-        this.inputs = new ArrayList<Double>();
-        loss = new MeanSquaredError();
-        initializeWeights(numInputs);
-    }
+		for (int i = 0; i < numInputs; i++) {
+			if (!isInputNode) {
+				weights.add(.5 + Math.random() / 10);
+			} else {
+				weights.add(0.0);
+			}
+		}
+	}
 
-    private void initializeWeights(int numInputs) {
-        // creates random initial weights.
-        weights = new ArrayList<Double>();
+	/** Batch updates all weights for this node */
+	public void updateWeights() {
+		delta_w_prev.clear();
+		for (int w = 0; w < weights.size(); w++) {
+			weights.set(w, weights.get(w) + delta_w.get(w));
+			delta_w_prev.add(delta_w.get(w));
+		}
+		delta_w.clear();
+	}
+	
+	public double getPrevDeltaW(int index){
+		if (delta_w_prev.size() > 0){
+			return delta_w_prev.get(index);
+		} else {
+			return 0;
+		}
+	}
 
-        for (int i = 0; i < numInputs; i++) {
-            if (!isInputNode) {
-                weights.add(.5 + Math.random() / 10);
-            } else {
-                weights.add(0.0);
-            }
-        }
-    }
+	public double calcOutput() {
+		if (isInputNode) {
+			// input nodes just output their value
+			output = inputs.get(0);
+		} else {
+			output = 0;
 
-    /**
-     * Batch updates all weights for this node
-     */
-    public void updateWeights() {
-        delta_w_prev.clear();
-        for (int w = 0; w < weights.size(); w++) {
-            weights.set(w, weights.get(w) + delta_w.get(w));
-            delta_w_prev.add(delta_w.get(w));
-        }
-        delta_w.clear();
-    }
+			// calculates \sum_i w_i x_i
+			for (int i = 0; i < inputs.size(); i++) {
+				output += (weights.get(i) * inputs.get(i));
+			}
 
-    public double getPrevDeltaW(int index) {
-        if (delta_w_prev.size() > 0) {
-            return delta_w_prev.get(index);
-        } else {
-            return 0;
-        }
-    }
+			output = f.calcfx(output);
+		}
+		return output;
+	}
 
-    public double calcOutput() {
-        if (isInputNode) {
-            // input nodes just output their value
-            output = inputs.get(0);
-        } else {
-            output = 0;
+	public void addInput(Double newInput) {
+		inputs.add(newInput);
+	}
 
-            // calculates \sum_i w_i x_i
-            for (int i = 0; i < inputs.size(); i++) {
-                output += (weights.get(i) * inputs.get(i));
-            }
+	/**
+	 * Adds input node to this node's list of ancestors, i.e. those nodes from
+	 * which it gets inputs
+	 * 
+	 * @param n
+	 *            the ancestor node to add
+	 */
+	public void addAncestor(Neuron n) {
+		if (!isInputNode) {
+			ancestors.add(n);
+		}
+	}
 
-            output = f.calcfx(output);
-        }
-        return output;
-    }
+	/**
+	 * Adds input node to this node's list of descendants, i.e. those nodes to
+	 * which it sends outputs
+	 * 
+	 * @param n
+	 *            the ancestor node to add
+	 */
+	public void addDescendant(Neuron n) {
+		if (!isOutputNode) {
+			descendants.add(n);
+		}
+	}
 
-    public void addInput(Double newInput) {
-        inputs.add(newInput);
-    }
+	public void clearInputs() {
+		inputs.clear();
+	}
 
-    /**
-     * Adds input node to this node's list of ancestors, i.e. those nodes from
-     * which it gets inputs
-     *
-     * @param n the ancestor node to add
-     */
-    public void addAncestor(Neuron n) {
-        if (!isInputNode) {
-            ancestors.add(n);
-        }
-    }
+	public String toString() {
+		String s = "";
+		if (isBias) {
+			s += "BIAS ";
+		}
 
-    /**
-     * Adds input node to this node's list of descendants, i.e. those nodes to
-     * which it sends outputs
-     *
-     * @param n the ancestor node to add
-     */
-    public void addDescendant(Neuron n) {
-        if (!isOutputNode) {
-            descendants.add(n);
-        }
-    }
+		s += "[L:" + layer + ", N:" + depth + "] " + "weights: <";
 
-    public void clearInputs() {
-        inputs.clear();
-    }
+		// System.out.print("# weights: " + weights.size() + " ");
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		DecimalFormat threeDForm = new DecimalFormat("#.###");
+		for (int w = 0; w < weights.size(); w++) {
+			double weight = Double.valueOf(twoDForm.format(weights.get(w)));
+			s += weight + " ";
+		}
 
-    public String toString() {
-        String s = "";
-        if (isBias) {
-            s += "BIAS ";
-        }
+		s += ", output: " + Double.valueOf(threeDForm.format(output)) + ">  ";
 
-        s += "[L:" + layer + ", N:" + depth + "] " + "weights: <";
+		return s;
+	}
 
-        // System.out.print("# weights: " + weights.size() + " ");
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
-        DecimalFormat threeDForm = new DecimalFormat("#.###");
-        for (Double weight1 : weights) {
-            double weight = Double.valueOf(twoDForm.format(weight1));
-            s += weight + " ";
-        }
+	public ArrayList<Neuron> getDescendants() {
+		return descendants;
+	}
 
-        s += ", output: " + Double.valueOf(threeDForm.format(output)) + ">  ";
+	public void setDescendants(ArrayList<Neuron> descendants) {
+		this.descendants = descendants;
+	}
 
-        return s;
-    }
+	public ArrayList<Neuron> getAncestors() {
+		return ancestors;
+	}
 
-    public ArrayList<Neuron> getDescendants() {
-        return descendants;
-    }
+	public void setAncestors(ArrayList<Neuron> ancestors) {
+		this.ancestors = ancestors;
+	}
 
-    public void setDescendants(ArrayList<Neuron> descendants) {
-        this.descendants = descendants;
-    }
+	public ArrayList<Double> getInputs() {
+		return inputs;
+	}
 
-    public ArrayList<Neuron> getAncestors() {
-        return ancestors;
-    }
+	public void setInputs(ArrayList<Double> inputs) {
+		this.inputs = inputs;
+	}
 
-    public void setAncestors(ArrayList<Neuron> ancestors) {
-        this.ancestors = ancestors;
-    }
+	public ArrayList<Double> getWeights() {
+		return weights;
+	}
 
-    public ArrayList<Double> getInputs() {
-        return inputs;
-    }
+	public void setWeights(ArrayList<Double> weights) {
+		this.weights = weights;
+	}
 
-    public void setInputs(ArrayList<Double> inputs) {
-        this.inputs = inputs;
-    }
+	public void addWeightChange(Double delta_w) {
+		this.delta_w.add(delta_w);
+	}
 
-    public ArrayList<Double> getWeights() {
-        return weights;
-    }
+	public double getOutput() {
+		return output;
+	}
 
-    public void setWeights(ArrayList<Double> weights) {
-        this.weights = weights;
-    }
+	public void setOutput(double output) {
+		this.output = output;
+	}
 
-    public void addWeightChange(Double delta_w) {
-        this.delta_w.add(delta_w);
-    }
+	public Double getDelta() {
+		return delta;
+	}
 
-    public double getOutput() {
-        return output;
-    }
+	public void setDelta(Double delta) {
+		this.delta = delta;
+	}
 
-    public void setOutput(double output) {
-        this.output = output;
-    }
+	/**
+	 * public double getError() { return error; }
+	 * 
+	 * public void setError(double error) { this.error = error; }
+	 */
 
-    public Double getDelta() {
-        return delta;
-    }
+	public int getLayer() {
+		return layer;
+	}
 
-    public void setDelta(Double delta) {
-        this.delta = delta;
-    }
+	public void setLayer(int layer) {
+		this.layer = layer;
+	}
 
-    /**
-     * public double getError() { return error; }
-     *
-     * public void setError(double error) { this.error = error; }
-     */
-    public int getLayer() {
-        return layer;
-    }
+	public int getDepth() {
+		return depth;
+	}
 
-    public void setLayer(int layer) {
-        this.layer = layer;
-    }
+	public void setDepth(int depth) {
+		this.depth = depth;
+	}
 
-    public int getDepth() {
-        return depth;
-    }
+	public boolean isInputNode() {
+		return isInputNode;
+	}
 
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
+	public void setInputNode(boolean isInputNode) {
+		this.isInputNode = isInputNode;
+	}
 
-    public boolean isInputNode() {
-        return isInputNode;
-    }
+	public boolean isOutputNode() {
+		return isOutputNode;
+	}
 
-    public void setInputNode(boolean isInputNode) {
-        this.isInputNode = isInputNode;
-    }
+	public void setOutputNode(boolean isOutputNode) {
+		this.isOutputNode = isOutputNode;
+	}
 
-    public boolean isOutputNode() {
-        return isOutputNode;
-    }
+	public boolean isBias() {
+		return isBias;
+	}
 
-    public void setOutputNode(boolean isOutputNode) {
-        this.isOutputNode = isOutputNode;
-    }
+	public void setBias(boolean isBias) {
+		this.isBias = isBias;
+		if (isBias) {
+			setOutput(bias);
+		}
+	}
 
-    public boolean isBias() {
-        return isBias;
-    }
+	public MeanSquaredError getError() {
+		return loss;
+	}
 
-    public void setBias(boolean isBias) {
-        this.isBias = isBias;
-        if (isBias) {
-            setOutput(bias);
-        }
-    }
-
-    public MeanSquaredError getError() {
-        return loss;
-    }
-
-    public ActivationFunction getActivation() {
-        return f;
-    }
-
-    public int getNumWeights() {
-        return weights.size();
-    }
+	public ActivationFunction getActivation() {
+		return f;
+	}
+	
+	public int getNumWeights(){
+		return weights.size();
+	}
 
 }
+

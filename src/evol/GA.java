@@ -26,6 +26,8 @@ public class GA extends TrainingStrategy {
 
 	// neural net
 	private FeedForwardANN net;
+	// training set
+	private ArrayList<TrainingInstance> trainingSet;
 
 	/**
 	 * Creates a new GA instance
@@ -59,7 +61,7 @@ public class GA extends TrainingStrategy {
 	protected void initPopulation() {
 		pop = new ArrayList<Chromosome>();
 		for (int i = 0; i < popSize; i++) {
-			pop.add(new Chromosome(net));
+			pop.add(new Chromosome(net, trainingSet));
 		}
 	}
 
@@ -73,6 +75,13 @@ public class GA extends TrainingStrategy {
 
 		run();
 	}
+	
+	/**
+	 * Must be called before optimization can be run
+	 */
+	public void setTrainingSet(ArrayList<TrainingInstance> trainingSet){
+		this.trainingSet = trainingSet;
+	}
 
 	/**
 	 * Runs optimization
@@ -80,7 +89,7 @@ public class GA extends TrainingStrategy {
 	private void run() {
 		System.out.println("--------------- STARTING! ---------------");
 		System.out.println("Initial fitness: " + (pop.get(pop.size()-1)).getFitness());
-		System.out.println("Initial error: " + (pop.get(pop.size()-1)).getNetworkError());
+		System.out.println("Initial error: " + (pop.get(pop.size()-1)).getAvgError());
 		
 		// runs for specified number of generations
 		for (int g = 0; g < gens; g++) {
@@ -119,10 +128,12 @@ public class GA extends TrainingStrategy {
 			}
 		}
 		
+		Collections.sort(pop);
+		
 		// TODO: return fittest
 		System.out.println("--------------- FINISHED!---------------");
 		System.out.println("Final fitness: " + (pop.get(pop.size()-1)).getFitness());
-		System.out.println("Final error: " + (pop.get(pop.size()-1)).getNetworkError());
+		System.out.println("Final error: " + (pop.get(pop.size()-1)).getAvgError());
 
 	}
 
@@ -179,7 +190,7 @@ public class GA extends TrainingStrategy {
 			parentProbs[i] = parentProbs[i - 1] + selectProb;
 		}
 
-		Chromosome offspring = new Chromosome(net);
+		Chromosome offspring = new Chromosome(net, trainingSet);
 		// probabilistically selects each gene
 		for (int i = 0; i < parents.get(0).getNumGenes(); i++) {
 			double p = Math.random();
@@ -206,9 +217,9 @@ public class GA extends TrainingStrategy {
 				//System.out.println("Mutated " + i);
 				double sign = Math.random();
 				if (sign < 0.5) {
-					c.setGene(i, c.getGene(i) + Math.random() / 100);
+					c.setGene(i, c.getGene(i) + Math.random() / 10);
 				} else {
-					c.setGene(i, c.getGene(i) - Math.random() / 100);
+					c.setGene(i, c.getGene(i) - Math.random() / 10);
 				}
 			}
 		}

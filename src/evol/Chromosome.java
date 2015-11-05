@@ -13,9 +13,10 @@ public class Chromosome implements Comparable {
 	private double networkError;
 	private FitnessFunction f;
 	private ArrayList<Double> outputs;
+	private ArrayList<TrainingInstance> trainSet;
+	private double avgError = 0; 
 
-
-	public Chromosome(FeedForwardANN net) {
+	public Chromosome(FeedForwardANN net, ArrayList<TrainingInstance> trainingSet) {
 
 		this.net = net;
 
@@ -24,6 +25,7 @@ public class Chromosome implements Comparable {
 		genes = new Double[numGenes];
 
 		f = new FitnessFunction();
+		this.trainSet = trainingSet;
 
 		// sets random initial gene values
 		randomInit();
@@ -54,12 +56,10 @@ public class Chromosome implements Comparable {
 	}
 
 	/**
-	 * Calculates the fitness of this chromosome
+	 * Calculates the fitness of this chromosome using a subset of the training set
 	 */
 	public void evaluate() {
-		// clear net inputs
-		net.clearInputs();
-		
+
 		//
 		// Step 1: assign weights using gene values
 		//
@@ -74,6 +74,8 @@ public class Chromosome implements Comparable {
 				for (int i = placeholder; i < net.getLayer(l).get(n).getNumWeights() + placeholder; i++) {
 					newWeights.add(genes[i]);
 				}
+				// modify placeholder
+				placeholder += newWeights.size();
 				net.getLayer(l).get(n).setWeights(newWeights);
 			}
 		}
@@ -81,17 +83,31 @@ public class Chromosome implements Comparable {
 		//
 		// Step 2: generate outputs using all the new weights
 		//
-		net.generateOutput();
-
+		
+		double cumulativeError = 0;
+		for (TrainingInstance t : trainSet) {
+			// clear net inputs
+			net.clearInputs();
+			
+			// set inputs and expected outputs
+			net.setInputs(t.getInputs());
+			net.setTargetOutputs(t.getOutput());
+			
+			// generate network output
+			net.generateOutput();
+			
+			// save error
+			cumulativeError += net.calcNetworkError();
+		}
 
 		//
 		// Step 3: calculate & assign fitness
 		//
-		
-		networkError = net.calcNetworkError();
-		if (net.calcNetworkError() > 0){
-			fitness = (1 / net.calcNetworkError());
-		} else{
+		avgError = cumulativeError/trainSet.size();
+
+		if (avgError > 0) {
+			fitness = (1 / avgError);
+		} else {
 			fitness = Double.MAX_VALUE;
 		}
 	}
@@ -107,16 +123,16 @@ public class Chromosome implements Comparable {
 	public double getFitness() {
 		return fitness;
 	}
-	
-	public double getNetworkError(){
+
+	public double getNetworkError() {
 		return networkError;
 	}
-	
-	public void setGene(int index, double gene){
+
+	public void setGene(int index, double gene) {
 		genes[index] = gene;
 	}
-	
-	public double getGene(int index){
+
+	public double getGene(int index) {
 		return genes[index];
 	}
 
@@ -132,15 +148,19 @@ public class Chromosome implements Comparable {
 		}
 	}
 
-	public String toString(){
+	public String toString() {
 		DecimalFormat threeDForm = new DecimalFormat("#.###");
-		
+
 		String s = "< ";
-		for (int i = 0; i < numGenes-1; i++){
+		for (int i = 0; i < numGenes - 1; i++) {
 			s += (Double.valueOf(threeDForm.format(genes[i])) + " ~ ");
 		}
-		
-		s += (Double.valueOf(threeDForm.format(genes[numGenes-1])) + ">");		
+
+		s += (Double.valueOf(threeDForm.format(genes[numGenes - 1])) + ">");
 		return s;
+	}
+	
+	public double getAvgError(){
+		return avgError;
 	}
 }
