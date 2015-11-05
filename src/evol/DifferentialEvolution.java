@@ -12,6 +12,7 @@ public class DifferentialEvolution extends TrainingStrategy {
     private ArrayList <Chromosome> pop = new ArrayList<Chromosome>();
     private Random rand = new Random();
     private int numGenes;
+    private ArrayList<TrainingInstance> trainingSet;
     
     public DifferentialEvolution(){
         
@@ -22,7 +23,7 @@ public class DifferentialEvolution extends TrainingStrategy {
             for(int p = 0; p < popSize; p++){
                 pop.get(p).evaluate();
                 double fitparent = pop.get(p).getFitness();
-                Chromosome trialvect = new Chromosome(net);
+                Chromosome trialvect = new Chromosome(net, trainingSet);
                 trialvect = mutation(trialvect, pop.get(p));
                 trialvect = crossover(trialvect, pop.get(p));
                 trialvect.evaluate();
@@ -49,7 +50,7 @@ public class DifferentialEvolution extends TrainingStrategy {
         return child;
     }
     private Chromosome crossover(Chromosome child, Chromosome parent){//Binomial crossover
-        Chromosome child1 = new Chromosome(net);
+        Chromosome child1 = new Chromosome(net, trainingSet);
         int jstar = rand.nextInt(numGenes);
         child1.setGene(jstar, child.getGene(jstar));
         for(int j = 1; j < numGenes; j++){

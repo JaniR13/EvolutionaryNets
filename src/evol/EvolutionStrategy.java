@@ -22,23 +22,25 @@ public class EvolutionStrategy extends TrainingStrategy {
     private FeedForwardANN net;
     private Random rand = new Random();
     private int numGenes;
+    private ArrayList<TrainingInstance> trainingSet;
 
     /**
      * Each member of the population will need: a Chromosome, and a variance
      * matrix
      */
-    public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens) {
+    public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens, 
+            ArrayList<TrainingInstance> trainingSet) {
         this.net = net;
         this.lambda = lambda;
         this.mu = mu;
         this.rho = rho;
         this.gens = gens;
-        
+        this.trainingSet = trainingSet;
     }
 
     private void initPop() {
         for (int i = 0; i < mu; i++) {
-            ESChromosome es = new ESChromosome(new Chromosome(net));
+            ESChromosome es = new ESChromosome(new Chromosome(net, trainingSet));
             pop.add(es);
         }
         numGenes = pop.get(0).getNumGenes();
@@ -51,7 +53,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         for (int g = 0; g < gens; g++) {
 
             for (int l = 0; l < lambda; l++) {
-                ESChromosome yl = new ESChromosome(new Chromosome(net));
+                ESChromosome yl = new ESChromosome(new Chromosome(net, trainingSet));
                 pool = marriage(pool);
 
                 yl = recombineParams(pool, yl);
@@ -66,18 +68,20 @@ public class EvolutionStrategy extends TrainingStrategy {
         }
         return returnBest();
     }
-    private ESChromosome returnBest(){
+
+    private ESChromosome returnBest() {
         double highFit = pop.get(0).getFitness();
         int highIndex = 0;
-        for(int i = 0; i < pop.size(); i++){
+        for (int i = 0; i < pop.size(); i++) {
             double curFit = pop.get(i).getFitness();
-            if(curFit > highFit){
+            if (curFit > highFit) {
                 highIndex = i;
                 highFit = curFit;
             }
         }
         return pop.get(highIndex);
     }
+
     private void prunePop(int pruneBy) {
 
         for (int i = 0; i < pruneBy; i++) {
@@ -134,6 +138,10 @@ public class EvolutionStrategy extends TrainingStrategy {
         }
         return child;
 
+    }
+
+    public void setTrainingSet(ArrayList<TrainingInstance> trainingSet) {
+        this.trainingSet = trainingSet;
     }
 
     public void setGens(int gens) {
