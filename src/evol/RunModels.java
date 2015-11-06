@@ -23,6 +23,9 @@ public class RunModels {
         System.out.println("Please pick from one of the following options");
         System.out.println("To convert output files 'con'");
         System.out.println("To run the feed-forward neural net (with backprop) type 'ffnn'");
+        System.out.println("To train the neural net with a genetic algorithm type 'ga'");
+        System.out.println("To train the neural net with an evolution strategy type 'es'");
+        System.out.println("To train the neural net with differential evolution type 'de'");
         System.out.println("Type 'x' to exit");
 
         choice = in.nextLine();
@@ -102,7 +105,145 @@ public class RunModels {
             System.out.println("Output Data: " + filePathOut);
             
             FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut);
-        } else {
+        } else if (choice.equals("ga")){
+            System.out.println("Training with Genetic Algorithm");
+            // gets the os for the computer this program is run on
+            String os = System.getProperty("os.name").toLowerCase();
+            // gets the home location
+            String home = System.getProperty("user.home");
+            // starts building the file path
+            String filePathTrain = home;
+            String filePathTest = home;
+            String keyWord = "";
+            //String to hold the filepath of the entire dataset
+            String filePathOut = "";
+
+            // uses file separator so is operating system agnostic
+            if (os.startsWith("windows")) { // Windows
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else if (os.startsWith("mac")) { // Mac
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else {
+                // everything else
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            }
+
+            // calls the file chooser, returns the updated file path
+            System.out.println("Select Training Data Location");
+            filePathTrain = callFileChooser(filePathTrain);
+            System.out.println("Training Data: " + filePathTrain);
+            System.out.println("Select Test Data Location");
+            filePathTest = callFileChooser(filePathTest);
+            System.out.println("Test Data: " + filePathTest);
+
+            System.out.println("Enter the keyword you would like to use to label your output files.");
+            keyWord = in.nextLine();
+
+            System.out.println("Select location where you would like to save your output files.");
+            filePathOut = getFileLocation();
+            filePathOut += File.separator + keyWord + "Out.txt";
+                    
+            System.out.println("Output Data: " + filePathOut);
+            
+        } else if (choice.equals("es")){
+            System.out.println("Training with Evolution Strategy");
+            // gets the os for the computer this program is run on
+            String os = System.getProperty("os.name").toLowerCase();
+            // gets the home location
+            String home = System.getProperty("user.home");
+            // starts building the file path
+            String filePathTrain = home;
+            String filePathTest = home;
+            String keyWord = "";
+            //String to hold the filepath of the entire dataset
+            String filePathOut = "";
+
+            // uses file separator so is operating system agnostic
+            if (os.startsWith("windows")) { // Windows
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else if (os.startsWith("mac")) { // Mac
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else {
+                // everything else
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            }
+
+            // calls the file chooser, returns the updated file path
+            System.out.println("Select Training Data Location");
+            filePathTrain = callFileChooser(filePathTrain);
+            System.out.println("Training Data: " + filePathTrain);
+            System.out.println("Select Test Data Location");
+            filePathTest = callFileChooser(filePathTest);
+            System.out.println("Test Data: " + filePathTest);
+
+            System.out.println("Enter the keyword you would like to use to label your output files.");
+            keyWord = in.nextLine();
+
+            System.out.println("Select location where you would like to save your output files.");
+            filePathOut = getFileLocation();
+            filePathOut += File.separator + keyWord + "Out.txt";
+                    
+            System.out.println("Output Data: " + filePathOut);
+            
+        } else if (choice.equals("de")){
+            System.out.println("Training with Differential Evolution");
+            // gets the os for the computer this program is run on
+            String os = System.getProperty("os.name").toLowerCase();
+            // gets the home location
+            String home = System.getProperty("user.home");
+            // starts building the file path
+            String filePathTrain = home;
+            String filePathTest = home;
+            String keyWord = "";
+            //String to hold the filepath of the entire dataset
+            String filePathOut = "";
+
+            // uses file separator so is operating system agnostic
+            if (os.startsWith("windows")) { // Windows
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else if (os.startsWith("mac")) { // Mac
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else {
+                // everything else
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            }
+
+            // calls the file chooser, returns the updated file path
+            System.out.println("Select Training Data Location");
+            filePathTrain = callFileChooser(filePathTrain);
+            System.out.println("Training Data: " + filePathTrain);
+            System.out.println("Select Test Data Location");
+            filePathTest = callFileChooser(filePathTest);
+            System.out.println("Test Data: " + filePathTest);
+
+            System.out.println("Enter the keyword you would like to use to label your output files.");
+            keyWord = in.nextLine();
+
+            System.out.println("Select location where you would like to save your output files.");
+            filePathOut = getFileLocation();
+            filePathOut += File.separator + keyWord + "Out.txt";
+                    
+            System.out.println("Output Data: " + filePathOut);
+            
+        }else {
             System.exit(0);
         }
     }
