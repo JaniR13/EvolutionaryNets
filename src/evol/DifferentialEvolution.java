@@ -14,8 +14,14 @@ public class DifferentialEvolution extends TrainingStrategy {
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
     
-    public DifferentialEvolution(){
-        
+    public DifferentialEvolution(int gens, int popSize, double beta, double pr, 
+            FeedForwardANN net, ArrayList<TrainingInstance> trainingSet){
+        this.gens = gens;
+        this.popSize = popSize;
+        this.beta = beta;
+        this.pr = pr;
+        this.net = net;
+        this.trainingSet = trainingSet;
     }
     public Chromosome run(){
         initPop();
@@ -37,8 +43,15 @@ public class DifferentialEvolution extends TrainingStrategy {
     }
     
     private void initPop(){
-        numGenes = pop.get(0).getNumGenes();
-        
+        Chromosome input = new Chromosome(net, trainingSet);
+        numGenes = input.getNumGenes();
+        for(int i = 0; i < popSize; i++){
+            pop.add(input);
+            for(int j = 0; j < numGenes; j++){
+                pop.get(i).setGene(j, rand.nextDouble());
+            }
+            input = new Chromosome(net, trainingSet);
+        }
     }
     private Chromosome mutation(Chromosome child, Chromosome parent){
         Chromosome p2 = pop.get(rand.nextInt(popSize));
