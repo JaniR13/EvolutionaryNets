@@ -101,11 +101,11 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "Out.txt";
-                    
+
             System.out.println("Output Data: " + filePathOut);
-            
+
             FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut);
-        } else if (choice.equals("ga")){
+        } else if (choice.equals("ga")) {
             System.out.println("Training with Genetic Algorithm");
             // gets the os for the computer this program is run on
             String os = System.getProperty("os.name").toLowerCase();
@@ -148,10 +148,10 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "Out.txt";
-                    
+
             System.out.println("Output Data: " + filePathOut);
-            
-        } else if (choice.equals("es")){
+
+        } else if (choice.equals("es")) {
             System.out.println("Training with Evolution Strategy");
             // gets the os for the computer this program is run on
             String os = System.getProperty("os.name").toLowerCase();
@@ -194,10 +194,10 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "Out.txt";
-                    
+
             System.out.println("Output Data: " + filePathOut);
-            
-        } else if (choice.equals("de")){
+
+        } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
             String os = System.getProperty("os.name").toLowerCase();
@@ -240,10 +240,10 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "Out.txt";
-                    
+
             System.out.println("Output Data: " + filePathOut);
-            
-        }else {
+
+        } else {
             System.exit(0);
         }
     }
@@ -308,4 +308,43 @@ public class RunModels {
         return filePath;
     }
 
-}
+    public static TrainingInstance createTrainingInstance(String fname) {
+        BufferedReader br = null; // read from data
+        String line = "";
+        String cvsSplitBy = ",";
+        ArrayList<Double> inputs = new ArrayList<Double>();
+        ArrayList<Double> output = new ArrayList<Double>();
+        try {
+            br = new BufferedReader(new FileReader(fname));
+
+            while ((line = br.readLine()) != null) {
+                
+                String[] example = line.split(cvsSplitBy);
+
+                // adds inputs (all but last number on line)
+                for (int i = 0; i < example.length - 1; i++) {
+                    Double in = Double.parseDouble(example[i]);
+                    inputs.add(in);
+                }
+
+                // puts input array into correctly-sized ArrayList of examples
+                int size = inputs.size();
+
+                // gets output
+                String stringoutput = example[example.length - 1];
+                Double o = Double.parseDouble(stringoutput);
+                
+
+                if (!output.contains(o)) {
+                    output.add(o);
+                }
+            }
+            }catch (Exception e) {
+            e.printStackTrace();
+        }
+            System.out.println("Done reading in training data");
+            TrainingInstance tIn = new TrainingInstance(inputs, output);
+            return tIn;
+        }
+
+    }
