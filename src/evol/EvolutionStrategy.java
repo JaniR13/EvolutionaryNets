@@ -28,7 +28,7 @@ public class EvolutionStrategy extends TrainingStrategy {
      * Each member of the population will need: a Chromosome, and a variance
      * matrix
      */
-    public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens, 
+    public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens,
             ArrayList<TrainingInstance> trainingSet) {
         this.net = net;
         this.lambda = lambda;
@@ -47,11 +47,16 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     public ESChromosome run() {
+
         initPop();
+        ESChromosome best = returnBest();
+        System.out.println("--------------- STARTING! ---------------");
+        System.out.println("Initial fitness: " + best.getFitness());
+        System.out.println("Initial error: " + best.getAvgError());
         ESChromosome[] pool = new ESChromosome[rho];
         // runs for specified number of generations
         for (int g = 0; g < gens; g++) {
-
+            System.out.println("> Generation " + g);
             for (int l = 0; l < lambda; l++) {
                 ESChromosome yl = new ESChromosome(new Chromosome(net, trainingSet));
                 pool = marriage(pool);
@@ -66,7 +71,11 @@ public class EvolutionStrategy extends TrainingStrategy {
             }
             prunePop(lambda);
         }
-        return returnBest();
+        best = returnBest();
+        System.out.println("--------------- FINISHED!---------------");
+	System.out.println("Final fitness: " + best.getFitness());
+	System.out.println("Final error: " + best.getAvgError());
+        return best;
     }
 
     private ESChromosome returnBest() {

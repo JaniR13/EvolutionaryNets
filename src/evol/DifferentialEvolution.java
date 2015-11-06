@@ -25,7 +25,12 @@ public class DifferentialEvolution extends TrainingStrategy {
     }
     public Chromosome run(){
         initPop();
+        Chromosome best = returnBest();
+        System.out.println("--------------- STARTING! ---------------");
+        System.out.println("Initial fitness: " + best.getFitness());
+        System.out.println("Initial error: " + best.getAvgError());
         for(int g = 0; g < gens; g++){
+            System.out.println("> Generation " + g);
             for(int p = 0; p < popSize; p++){
                 pop.get(p).evaluate();
                 double fitparent = pop.get(p).getFitness();
@@ -39,7 +44,11 @@ public class DifferentialEvolution extends TrainingStrategy {
                 }
             }
         }
-        return returnBest();
+        best = returnBest();
+        System.out.println("--------------- FINISHED!---------------");
+	System.out.println("Final fitness: " + best.getFitness());
+	System.out.println("Final error: " + best.getAvgError());
+        return best;
     }
     
     private void initPop(){

@@ -75,4 +75,7 @@ public class ESChromosome {
     public void setGene(int i, double gene) {
         c.setGene(i, gene);
     }
+    public double getAvgError(){
+        return c.getAvgError();
+    }
 }
