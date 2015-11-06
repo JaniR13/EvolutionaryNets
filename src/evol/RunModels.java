@@ -150,7 +150,11 @@ public class RunModels {
             filePathOut += File.separator + keyWord + "Out.txt";
 
             System.out.println("Output Data: " + filePathOut);
-
+            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            GA ga = new GA(0.5, 100, 50, 3, 0.25);
+            ga.setTrainingSet(trainData);
+            ga.optimize(net);
         } else if (choice.equals("es")) {
             System.out.println("Training with Evolution Strategy");
             // gets the os for the computer this program is run on
@@ -196,7 +200,10 @@ public class RunModels {
             filePathOut += File.separator + keyWord + "Out.txt";
 
             System.out.println("Output Data: " + filePathOut);
-
+            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            EvolutionStrategy es = new EvolutionStrategy(50, 5, 5, 2, net, trainData);
+            es.run();
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
@@ -242,7 +249,10 @@ public class RunModels {
             filePathOut += File.separator + keyWord + "Out.txt";
 
             System.out.println("Output Data: " + filePathOut);
-
+            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            DifferentialEvolution de = new DifferentialEvolution(50, 100, 0.1, 0.1, net, trainData);
+            de.run();
         } else {
             System.exit(0);
         }
@@ -308,17 +318,17 @@ public class RunModels {
         return filePath;
     }
 
-    public static TrainingInstance createTrainingInstance(String fname) {
+    public static ArrayList<TrainingInstance> createTrainingInstance(String fname) {
         BufferedReader br = null; // read from data
         String line = "";
         String cvsSplitBy = ",";
-        ArrayList<Double> inputs = new ArrayList<Double>();
-        ArrayList<Double> output = new ArrayList<Double>();
+        ArrayList<TrainingInstance> data = new ArrayList<TrainingInstance>();
         try {
             br = new BufferedReader(new FileReader(fname));
 
             while ((line = br.readLine()) != null) {
-                
+                ArrayList<Double> inputs = new ArrayList<Double>();
+                ArrayList<Double> output = new ArrayList<Double>();
                 String[] example = line.split(cvsSplitBy);
 
                 // adds inputs (all but last number on line)
@@ -333,18 +343,19 @@ public class RunModels {
                 // gets output
                 String stringoutput = example[example.length - 1];
                 Double o = Double.parseDouble(stringoutput);
-                
 
                 if (!output.contains(o)) {
                     output.add(o);
                 }
+                TrainingInstance tIn = new TrainingInstance(inputs, output);
+                data.add(tIn);
             }
-            }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-            System.out.println("Done reading in training data");
-            TrainingInstance tIn = new TrainingInstance(inputs, output);
-            return tIn;
-        }
-
+        System.out.println("Done reading in training data");
+        
+        return data;
     }
+
+}

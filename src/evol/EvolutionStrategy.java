@@ -14,7 +14,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     //number of parents in crossover
     private int rho;
     //Population
-    private ArrayList<ESChromosome> pop;
+    private ArrayList<ESChromosome> pop= new ArrayList<ESChromosome>();
     //parameters for mutating strategy parameters
     private double tauOverall;
     private double tauInd;
@@ -28,7 +28,7 @@ public class EvolutionStrategy extends TrainingStrategy {
      * Each member of the population will need: a Chromosome, and a variance
      * matrix
      */
-    public EvolutionStrategy(FeedForwardANN net, int lambda, int mu, int rho, int gens,
+    public EvolutionStrategy(int gens, int mu, int lambda, int rho,  FeedForwardANN net,
             ArrayList<TrainingInstance> trainingSet) {
         this.net = net;
         this.lambda = lambda;
@@ -36,6 +36,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.rho = rho;
         this.gens = gens;
         this.trainingSet = trainingSet;
+        
     }
 
     private void initPop() {
