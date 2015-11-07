@@ -207,45 +207,17 @@ public class RunModels {
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "ESOut.txt";
 
-//            System.out.println("Output Data: " + filePathOut);
-//            int[] numGens = {5, 10, 25, 50, 100, 300, 500, 800, 1000};
-//            for (int i = 0; i < numGens.length; i++) {//Tune number of generations
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                EvolutionStrategy es = new EvolutionStrategy(numGens[i], 5, 5, 2, net, trainData);
-//                System.out.println("number of generations: " + numGens[i]);
-//                es.run();
-//            }//100-300 is best number of generations
-//            int[] popsize = {2, 5, 10, 25, 50, 100};
-//            for (int i = 0; i < popsize.length; i++) {//Tune number of generations
-//                for (int j = 0; j < popsize.length; j++) {
-//                    if (i <= j) {
-//                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                        EvolutionStrategy es = new EvolutionStrategy(100, popsize[i], popsize[j], 2, net, trainData);//TODO use best results of previous tuning
-//                        System.out.println("population size: " + popsize[i] + ", generation size: " + popsize[j]);
-//                        es.run();
-//                    }
-//                }
-//            }//best mu = 50, best lambda = 100
-            //second best mu = 25, second best lambda = 50
-//            int[] rhosize = {2, 3, 4, 5, 6, 7, 8, 9, 10};
-//            for (int i = 0; i < rhosize.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                EvolutionStrategy es = new EvolutionStrategy(100, 50, 100, rhosize[i], net, trainData);//TODO use best results of previous tuning
-//                System.out.println("rho size: " + rhosize[i]);
-//                es.run();
-//            }//rho of 2, 4 or 5 produces best results. 4 is best
+//            int[] popsize = {10, 25, 50, 100};
+//            int[] rhosize = {2, 3, 4, 5};
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData, filePathOut);
+            EvolutionStrategy es = new EvolutionStrategy(10000, 10, 10, 2, net, trainData, filePathOut);
             net = es.run(0.0001);
             //net.print();
             ArrayList<Double> error = runTestData(testData, net);
 
-        System.out.println("Generations: " + es.genCount);
+            System.out.println("Generations: " + es.genCount);
             for (int i = 0; i < error.size(); i++) {
                 System.out.println("i: " + i + ", error: " + error.get(i));
             }
@@ -291,82 +263,54 @@ public class RunModels {
             keyWord = in.nextLine();
 
             System.out.println("Select location where you would like to save your output files.");
-            filePathOut = getFileLocation();
-            filePathOut += File.separator + keyWord + "DEOut.txt";
-            System.out.println("Output Data: " + filePathOut);
+            String filePathOut1 = getFileLocation();
 
-            //int[] popsize = {10,25,50,100,250,500,1000};
-            //double[] betas = {0.1, 0.5, 1, 5, 10, 25, 50};//gotta be honest, I have no idea what a good range is for this
-            //double[] prs = {0.001, 0.005, 0.01, 0.05, 0.1, 0.5};
-//            System.out.println("Training population size");
-//            for (int i = 0; i < popsize.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                DifferentialEvolution de = new DifferentialEvolution(50, popsize[i], 10, 0.1, net, trainData);
-//                System.out.println("population size: " + popsize[i]);
-//                de.run();
-//            }
-//            System.out.println("");
-//            System.out.println("----------");
-//            System.out.println("Training beta");
-//            
-//            for (int i = 0; i < betas.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                DifferentialEvolution de = new DifferentialEvolution(50, 250, betas[i], 0.1, net, trainData);
-//                DifferentialEvolution de2 = new DifferentialEvolution(50, 250, betas[i], 0.05, net, trainData);
-//                System.out.println("beta: " + betas[i] + ", Pr  = 0.1");
-//                de.run();
-//                System.out.println("beta: " + betas[i] + ", Pr = 0.05");
-//                de2.run();
-//            }//ideal settings: population size of 100 or 250,
-            //beta of 25
-            //Pr of 0.1
-//            System.out.println("");
-//            System.out.println("----------");
-//            System.out.println("Training Pr");
-//            for (int i = 0; i < prs.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                DifferentialEvolution de = new DifferentialEvolution(50, 250, 10, prs[i], net, trainData);
-//                System.out.println("Pr: " + prs[i]);
-//                de.run();
-//            }
-            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-            ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
-            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            int[] popsize = {50, 100, 250, 500};
+            double[] betas = {1, 5, 10, 25};//gotta be honest, I have no idea what a good range is for this
+            double[] prs = {0.01, 0.05, 0.1, 0.5};
+            for (int j = 0; j < popsize.length; j++) {
+                for (int k = 0; k < betas.length; k++) {
+                    for (int l = 0; l < prs.length; l++) {
 
-            //Monica changed from 
-            DifferentialEvolution de = new DifferentialEvolution(1000, 100, 25, 0.1, net, trainData, filePathOut);
-            net = de.run(0.01);
-            ArrayList<Double> error = runTestData(testData, net);
+                        filePathOut = filePathOut1 + File.separator + keyWord + j + "" + k + "" + l + "DEOut.txt";
+                        System.out.println("Output Data: " + filePathOut);
+                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+                        ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
+                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
 
-            PrintWriter printWriter = null;
+                        //Monica changed from 
+                        DifferentialEvolution de = new DifferentialEvolution(1000, popsize[j], betas[k], prs[l], net, trainData, filePathOut);
+                        net = de.run(0.001);
+                        ArrayList<Double> error = runTestData(testData, net);
 
-            File file = new File(filePathOut);
+                        PrintWriter printWriter = null;
 
-            try {
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
-                printWriter.append("Begin test data");
-                for (int i = 0; i < error.size(); i++) {
-                    printWriter.append("Test instance: " + i + ", error: " + error.get(i));
-                    printWriter.println();
-                }
+                        File file = new File(filePathOut);
 
-            } catch (IOException ioex) {
-                ioex.printStackTrace();
-            } finally {
-                if (printWriter != null) {
-                    printWriter.flush();
-                    printWriter.close();
+                        try {
+                            if (!file.exists()) {
+                                file.createNewFile();
+                            }
+                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+                            printWriter.append("Begin test data");
+                            for (int i = 0; i < error.size(); i++) {
+                                printWriter.append("Test instance: " + i + ", error: " + error.get(i));
+                                printWriter.println();
+                            }
+
+                        } catch (IOException ioex) {
+                            ioex.printStackTrace();
+                        } finally {
+                            if (printWriter != null) {
+                                printWriter.flush();
+                                printWriter.close();
+                            }
+                        }
+
+                        System.out.println("Generations: " + de.genCount);
+                    }
                 }
             }
-
-            System.out.println("Generations: " + de.genCount);
-
         } else {
             System.exit(0);
         }

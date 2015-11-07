@@ -74,6 +74,7 @@ public class DifferentialEvolution extends TrainingStrategy {
         System.out.println("Initial error: " + err);
 
         if (choice.equals("y")) {
+            writer.write("population size: " + popSize + ", beta: "+ beta + ", Pr: " + pr);
             writer.write("Initial fitness: " + best.getFitness());
             writer.println();
             writer.write("Initial error: " + err);
@@ -109,7 +110,8 @@ public class DifferentialEvolution extends TrainingStrategy {
                     pop.set(p, trialvect);
                 }
             }
-            err = returnBest().getAvgError();
+           best = returnBest();
+           err = best.getAvgError();
             genCount++;
         }
         //return the best individual
