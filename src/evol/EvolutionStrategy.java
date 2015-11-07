@@ -35,8 +35,7 @@ public class EvolutionStrategy extends TrainingStrategy {
      * @param net net to train on
      * @param trainingSet training data
      */
-
-    public EvolutionStrategy(int gens, int mu, int lambda, int rho, FeedForwardANN net,
+    public EvolutionStrategy(int gens, int mu, int lambda, int rho,  FeedForwardANN net,
             ArrayList<TrainingInstance> trainingSet, String filePathOut) {
         this.net = net;
         this.lambda = lambda;

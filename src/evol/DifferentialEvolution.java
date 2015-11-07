@@ -115,7 +115,6 @@ public class DifferentialEvolution extends TrainingStrategy {
         //return the best individual
         best = returnBest();
         System.out.println("--------------- FINISHED!---------------");
-
         System.out.println("Final fitness: " + best.getFitness());
         System.out.println("Final error: " + best.getAvgError());
 
@@ -131,10 +130,14 @@ public class DifferentialEvolution extends TrainingStrategy {
 
         best.evaluate();
         return net;
+
+
     }
 
-    //randomly initialize the population
-    private void initPop() {
+
+
+//randomly initialize the population
+private void initPop() {
         for (int i = 0; i < popSize; i++) {
             Chromosome de = new Chromosome(net, trainingSet);
             pop.add(de);

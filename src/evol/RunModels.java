@@ -156,7 +156,7 @@ public class RunModels {
             GA ga = new GA(0.5, 100, 50, 0.25, 3);
             ga.setTrainingSet(trainData);
             net = ga.optimize(net);
-            
+
             ArrayList<Double> error = runTestData(testData, net);
 
             //System.out.println("Generations: " + es.genCount);
@@ -240,13 +240,12 @@ public class RunModels {
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            //net.print();
             EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData, filePathOut);
             net = es.run(0.0001);
             //net.print();
             ArrayList<Double> error = runTestData(testData, net);
 
-            System.out.println("Generations: " + es.genCount);
+        System.out.println("Generations: " + es.genCount);
             for (int i = 0; i < error.size(); i++) {
                 System.out.println("i: " + i + ", error: " + error.get(i));
             }
@@ -294,7 +293,6 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "DEOut.txt";
-
             System.out.println("Output Data: " + filePathOut);
 
             //int[] popsize = {10,25,50,100,250,500,1000};
@@ -358,7 +356,7 @@ public class RunModels {
                     printWriter.println();
                 }
 
-             } catch (IOException ioex) {
+            } catch (IOException ioex) {
                 ioex.printStackTrace();
             } finally {
                 if (printWriter != null) {
@@ -368,9 +366,6 @@ public class RunModels {
             }
 
             System.out.println("Generations: " + de.genCount);
-//            for (int i = 0; i < error.size(); i++) {
-//                System.out.println("i: " + i + ", error: " + error.get(i));
-//            }
 
         } else {
             System.exit(0);
