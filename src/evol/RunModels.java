@@ -230,9 +230,12 @@ public class RunModels {
 //                es.run();
 //            }//rho of 2, 4 or 5 produces best results. 4 is best
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            //net.print();
             EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData);
-            es.run(0.01);
+            net = es.run(0.01);
+            //net.print();
             System.out.println("Generations: " + es.genCount);
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
@@ -425,6 +428,16 @@ public class RunModels {
         //System.out.println("Done reading in training data");
 
         return data;
+    }
+    public static ArrayList<Double> runTestData(ArrayList<TrainingInstance> testData, FeedForwardANN net){
+        ArrayList<Double> error = new ArrayList<Double>();
+        for(int i = 0; i < testData.size(); i++){
+            net.clearInputs();
+            net.setInputs(testData.get(i).getInputs());
+            net.generateOutput();
+            error.add(net.calcNetworkError());
+        }
+        return error;
     }
 
 }
