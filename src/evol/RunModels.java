@@ -278,42 +278,48 @@ public class RunModels {
             filePathOut += File.separator + keyWord + "Out.txt";
 
             System.out.println("Output Data: " + filePathOut);
-            int[] popsize = {10,25,50,100,250,500,1000};
-            double[] betas = {};//gotta be honest, I have no idea what a good range is for this
-            double[] prs = {0.001, 0.005, 0.01, 0.05, 0.1, 0.5};
-            System.out.println("Training population size");
-            for (int i = 0; i < popsize.length; i++) {
-                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-                DifferentialEvolution de = new DifferentialEvolution(100, popsize[i], 0.1, 0.1, net, trainData);
-                System.out.println("population size: " + popsize[i]);
-                de.run();
-            }
-            System.out.println("");
-            System.out.println("----------");
-            System.out.println("Training beta");
             
-            for (int i = 0; i < betas.length; i++) {
-                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-                DifferentialEvolution de = new DifferentialEvolution(50, 100, betas[i], 0.1, net, trainData);
-                System.out.println("beta: " + betas[i]);
-                de.run();
-            }
-            System.out.println("");
-            System.out.println("----------");
-            System.out.println("Training Pr");
-            for (int i = 0; i < prs.length; i++) {
-                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-                DifferentialEvolution de = new DifferentialEvolution(50, 100, 0.1, prs[i], net, trainData);
-                System.out.println("Pr: " + prs[i]);
-                de.run();
-            }
-//            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//            DifferentialEvolution de = new DifferentialEvolution(50, 100, 0.1, 0.1, net, trainData);
-//            de.run();
+            //int[] popsize = {10,25,50,100,250,500,1000};
+            //double[] betas = {1, 5, 10, 25, 50};//gotta be honest, I have no idea what a good range is for this
+            //double[] prs = {0.001, 0.005, 0.01, 0.05, 0.1, 0.5};
+//            System.out.println("Training population size");
+//            for (int i = 0; i < popsize.length; i++) {
+//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//                DifferentialEvolution de = new DifferentialEvolution(50, popsize[i], 10, 0.1, net, trainData);
+//                System.out.println("population size: " + popsize[i]);
+//                de.run();
+//            }
+//            System.out.println("");
+//            System.out.println("----------");
+//            System.out.println("Training beta");
+//            
+//            for (int i = 0; i < betas.length; i++) {
+//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//                DifferentialEvolution de = new DifferentialEvolution(50, 250, betas[i], 0.1, net, trainData);
+//                DifferentialEvolution de2 = new DifferentialEvolution(50, 250, betas[i], 0.05, net, trainData);
+//                System.out.println("beta: " + betas[i] + ", Pr  = 0.1");
+//                de.run();
+//                System.out.println("beta: " + betas[i] + ", Pr = 0.05");
+//                de2.run();
+//            }//ideal settings: population size of 100 or 250,
+                    //beta of 25
+                    //Pr of 0.1
+//            System.out.println("");
+//            System.out.println("----------");
+//            System.out.println("Training Pr");
+//            for (int i = 0; i < prs.length; i++) {
+//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//                DifferentialEvolution de = new DifferentialEvolution(50, 250, 10, prs[i], net, trainData);
+//                System.out.println("Pr: " + prs[i]);
+//                de.run();
+//            }
+            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            DifferentialEvolution de = new DifferentialEvolution(100, 250, 25, 0.1, net, trainData);
+            de.run();
         } else {
             System.exit(0);
         }
