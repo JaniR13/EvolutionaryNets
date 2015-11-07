@@ -208,26 +208,31 @@ public class RunModels {
 //                System.out.println("number of generations: " + numGens[i]);
 //                es.run();
 //            }//100-300 is best number of generations
-            int[] popsize = {2, 5, 10, 25, 50, 100};
-            for (int i = 0; i < popsize.length; i++) {//Tune number of generations
-                for (int j = 0; j < popsize.length; j++) {
-                    if (i <= j) {
-                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-                        EvolutionStrategy es = new EvolutionStrategy(50, popsize[i], popsize[j], 2, net, trainData);//TODO use best results of previous tuning
-                        System.out.println("population size: " + popsize[i] + ", generation size: " + popsize[j]);
-                        es.run();
-                    }
-                }
-            }
+//            int[] popsize = {2, 5, 10, 25, 50, 100};
+//            for (int i = 0; i < popsize.length; i++) {//Tune number of generations
+//                for (int j = 0; j < popsize.length; j++) {
+//                    if (i <= j) {
+//                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//                        EvolutionStrategy es = new EvolutionStrategy(100, popsize[i], popsize[j], 2, net, trainData);//TODO use best results of previous tuning
+//                        System.out.println("population size: " + popsize[i] + ", generation size: " + popsize[j]);
+//                        es.run();
+//                    }
+//                }
+//            }//best mu = 50, best lambda = 100
+            //second best mu = 25, second best lambda = 50
 //            int[] rhosize = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 //            for (int i = 0; i < rhosize.length; i++) {
 //                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
 //                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                EvolutionStrategy es = new EvolutionStrategy(100, 5, 5, rhosize[i], net, trainData);//TODO use best results of previous tuning
+//                EvolutionStrategy es = new EvolutionStrategy(100, 50, 100, rhosize[i], net, trainData);//TODO use best results of previous tuning
 //                System.out.println("rho size: " + rhosize[i]);
 //                es.run();
-//            }
+//            }//rho of 2, 4 or 5 produces best results. 4 is best
+            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+            EvolutionStrategy es = new EvolutionStrategy(100, 50, 100, 4, net, trainData);
+            es.run();
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
@@ -273,10 +278,42 @@ public class RunModels {
             filePathOut += File.separator + keyWord + "Out.txt";
 
             System.out.println("Output Data: " + filePathOut);
-            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            DifferentialEvolution de = new DifferentialEvolution(50, 100, 0.1, 0.1, net, trainData);
-            de.run();
+            int[] popsize = {10,25,50,100,250,500,1000};
+            double[] betas = {};//gotta be honest, I have no idea what a good range is for this
+            double[] prs = {0.001, 0.005, 0.01, 0.05, 0.1, 0.5};
+            System.out.println("Training population size");
+            for (int i = 0; i < popsize.length; i++) {
+                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+                DifferentialEvolution de = new DifferentialEvolution(100, popsize[i], 0.1, 0.1, net, trainData);
+                System.out.println("population size: " + popsize[i]);
+                de.run();
+            }
+            System.out.println("");
+            System.out.println("----------");
+            System.out.println("Training beta");
+            
+            for (int i = 0; i < betas.length; i++) {
+                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+                DifferentialEvolution de = new DifferentialEvolution(50, 100, betas[i], 0.1, net, trainData);
+                System.out.println("beta: " + betas[i]);
+                de.run();
+            }
+            System.out.println("");
+            System.out.println("----------");
+            System.out.println("Training Pr");
+            for (int i = 0; i < prs.length; i++) {
+                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+                DifferentialEvolution de = new DifferentialEvolution(50, 100, 0.1, prs[i], net, trainData);
+                System.out.println("Pr: " + prs[i]);
+                de.run();
+            }
+//            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//            DifferentialEvolution de = new DifferentialEvolution(50, 100, 0.1, 0.1, net, trainData);
+//            de.run();
         } else {
             System.exit(0);
         }
@@ -377,7 +414,7 @@ public class RunModels {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Done reading in training data");
+        //System.out.println("Done reading in training data");
 
         return data;
     }
