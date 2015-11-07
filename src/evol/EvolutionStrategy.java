@@ -14,7 +14,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     //number of parents in crossover
     private int rho;
     //Population
-    private ArrayList<ESChromosome> pop= new ArrayList<ESChromosome>();
+    private ArrayList<ESChromosome> pop = new ArrayList<ESChromosome>();
     //parameters for mutating strategy parameters
     private double tauOverall;
     private double tauInd;
@@ -23,10 +23,11 @@ public class EvolutionStrategy extends TrainingStrategy {
     private Random rand = new Random();
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
- public int genCount;
+    public int genCount;
+
     /**
      * Creates a new evolution strategy instance
-     * 
+     *
      * @param gens number of generations
      * @param mu population size
      * @param lambda generation size (number of children)
@@ -34,7 +35,7 @@ public class EvolutionStrategy extends TrainingStrategy {
      * @param net net to train on
      * @param trainingSet training data
      */
-    public EvolutionStrategy(int gens, int mu, int lambda, int rho,  FeedForwardANN net,
+    public EvolutionStrategy(int gens, int mu, int lambda, int rho, FeedForwardANN net,
             ArrayList<TrainingInstance> trainingSet) {
         this.net = net;
         this.lambda = lambda;
@@ -42,9 +43,10 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.rho = rho;
         this.gens = gens;
         this.trainingSet = trainingSet;
-        
+
     }
 //Randomly initializes the population
+
     private void initPop() {
         for (int i = 0; i < mu; i++) {
             ESChromosome es = new ESChromosome(new Chromosome(net, trainingSet));
@@ -53,7 +55,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         numGenes = pop.get(0).getNumGenes();
     }
 
-    public ESChromosome run(double conf) {
+    public FeedForwardANN run(double conf) {
 //initialize population
         initPop();
         //determine best element
@@ -65,11 +67,10 @@ public class EvolutionStrategy extends TrainingStrategy {
         genCount = 0;
         //Array of size rho for the making children
         ESChromosome[] pool = new ESChromosome[rho];
-        while(err > conf && genCount < gens){
-        
+        while (err > conf && genCount < gens) {
+
         // runs for specified number of generations
-        
-       // for (int g = 0; g < gens; g++) {
+            // for (int g = 0; g < gens; g++) {
             //System.out.println("> Generation " + g);
             for (int l = 0; l < lambda; l++) {
                 //generate a random child
@@ -94,9 +95,10 @@ public class EvolutionStrategy extends TrainingStrategy {
         //determine best child
         best = returnBest();
         System.out.println("--------------- FINISHED!---------------");
-	System.out.println("Final fitness: " + best.getFitness());
-	System.out.println("Final error: " + best.getAvgError());
-        return best;
+        System.out.println("Final fitness: " + best.getFitness());
+        System.out.println("Final error: " + best.getAvgError());
+        best.evaluateFitness();
+        return net;
     }
 
     private ESChromosome returnBest() {
@@ -177,7 +179,9 @@ public class EvolutionStrategy extends TrainingStrategy {
         return child;
 
     }
+
     //getter and setter methods
+
     public void setTrainingSet(ArrayList<TrainingInstance> trainingSet) {
         this.trainingSet = trainingSet;
     }
