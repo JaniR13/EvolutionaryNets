@@ -233,9 +233,11 @@ public class RunModels {
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             //net.print();
-            EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData);
+            EvolutionStrategy es = new EvolutionStrategy(1000, 50, 100, 4, net, trainData);
             net = es.run(0.01);
             //net.print();
+            ArrayList<Double> error = runTestData(testData, net);
+            System.out.println("error: " + error);
             System.out.println("Generations: " + es.genCount);
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
@@ -321,9 +323,12 @@ public class RunModels {
 //                de.run();
 //            }
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             DifferentialEvolution de = new DifferentialEvolution(10000, 100, 25, 0.1, net, trainData);
-            de.run(0.01);
+            net = de.run(0.01);
+            ArrayList<Double> error = runTestData(testData, net);
+            System.out.println("error: " + error);
             System.out.println("Generations: " + de.genCount);
         } else {
             System.exit(0);
