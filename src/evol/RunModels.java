@@ -231,8 +231,9 @@ public class RunModels {
 //            }//rho of 2, 4 or 5 produces best results. 4 is best
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            EvolutionStrategy es = new EvolutionStrategy(100, 50, 100, 4, net, trainData);
-            es.run();
+            EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData);
+            es.run(0.01);
+            System.out.println("Generations: " + es.genCount);
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
@@ -318,8 +319,9 @@ public class RunModels {
 //            }
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            DifferentialEvolution de = new DifferentialEvolution(100, 250, 25, 0.1, net, trainData);
-            de.run();
+            DifferentialEvolution de = new DifferentialEvolution(10000, 100, 25, 0.1, net, trainData);
+            de.run(0.01);
+            System.out.println("Generations: " + de.genCount);
         } else {
             System.exit(0);
         }

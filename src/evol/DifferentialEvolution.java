@@ -17,7 +17,7 @@ public class DifferentialEvolution extends TrainingStrategy {
     private Random rand = new Random();
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
-    
+    public int genCount;
     
     /**
      * Creates a new Differential Evolution instance
@@ -37,15 +37,18 @@ public class DifferentialEvolution extends TrainingStrategy {
         this.net = net;
         this.trainingSet = trainingSet;
     }
-    public Chromosome run(){
+    public Chromosome run(double conf){
         //initialize the population
         initPop();
         //determine starting fitness
         Chromosome best = returnBest();
+        double err = best.getAvgError();
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
-        System.out.println("Initial error: " + best.getAvgError());
-        for(int g = 0; g < gens; g++){
+        System.out.println("Initial error: " + err);
+        genCount = 0;
+        while(err > conf && genCount < gens){
+        //for(int g = 0; g < gens; g++){
             //System.out.println("> Generation " + g);
             //generate a child for each member of the population
             for(int p = 0; p < popSize; p++){
@@ -66,6 +69,8 @@ public class DifferentialEvolution extends TrainingStrategy {
                     pop.set(p, trialvect);
                 }
             }
+            err = returnBest().getAvgError();
+            genCount++;
         }
         //return the best individual
         best = returnBest();

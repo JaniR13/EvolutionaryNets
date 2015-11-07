@@ -23,7 +23,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     private Random rand = new Random();
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
-
+ public int genCount;
     /**
      * Creates a new evolution strategy instance
      * 
@@ -53,19 +53,23 @@ public class EvolutionStrategy extends TrainingStrategy {
         numGenes = pop.get(0).getNumGenes();
     }
 
-    public ESChromosome run() {
+    public ESChromosome run(double conf) {
 //initialize population
         initPop();
         //determine best element
         ESChromosome best = returnBest();
+        double err = best.getAvgError();
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
-        System.out.println("Initial error: " + best.getAvgError());
+        System.out.println("Initial error: " + err);
+        genCount = 0;
         //Array of size rho for the making children
         ESChromosome[] pool = new ESChromosome[rho];
+        while(err > conf && genCount < gens){
+        
         // runs for specified number of generations
         
-        for (int g = 0; g < gens; g++) {
+       // for (int g = 0; g < gens; g++) {
             //System.out.println("> Generation " + g);
             for (int l = 0; l < lambda; l++) {
                 //generate a random child
@@ -84,6 +88,8 @@ public class EvolutionStrategy extends TrainingStrategy {
             }
             //cut the lambda least fit children from the population
             prunePop(lambda);
+            err = returnBest().getAvgError();
+            genCount++;
         }
         //determine best child
         best = returnBest();
