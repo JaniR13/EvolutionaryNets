@@ -2,14 +2,13 @@ package evol;
 /*
  * The class that contains the main method. From here user can call a method to 
  * convert a dataset to test and training sets, or test/train a FFNN with backpropagation. 
- * Additionally, the user can choose one of three evolutionary approaches to train
- * the weights for the FFNN. 
+ * Additionally, the user can choose one of three evolutionary approaches (GA, ES and 
+ * DE) to train the weights for the FFNN. 
  */
 
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-
 import java.util.*;
 
 public class RunModels {
@@ -241,14 +240,39 @@ public class RunModels {
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData, filePathOut);
+
             net = es.run(0.0001);
             //net.print();
             ArrayList<Double> error = runTestData(testData, net);
 
-        System.out.println("Generations: " + es.genCount);
-            for (int i = 0; i < error.size(); i++) {
-                System.out.println("i: " + i + ", error: " + error.get(i));
+            PrintWriter printWriter = null;
+
+            File file = new File(filePathOut);
+
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+                printWriter.append("Begin test data");
+                for (int i = 0; i < error.size(); i++) {
+                    printWriter.append("Test instance: " + i + ", error: " + error.get(i));
+                    printWriter.println();
+                }
+
+            } catch (IOException ioex) {
+                ioex.printStackTrace();
+            } finally {
+                if (printWriter != null) {
+                    printWriter.flush();
+                    printWriter.close();
+                }
             }
+
+            es.run(0.01);
+
+            System.out.println("Generations: " + es.genCount);
+            System.out.println("ES finished for " + keyWord + " dataset");
 
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
@@ -293,51 +317,14 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "DEOut.txt";
+
             System.out.println("Output Data: " + filePathOut);
 
-            //int[] popsize = {10,25,50,100,250,500,1000};
-            //double[] betas = {0.1, 0.5, 1, 5, 10, 25, 50};//gotta be honest, I have no idea what a good range is for this
-            //double[] prs = {0.001, 0.005, 0.01, 0.05, 0.1, 0.5};
-//            System.out.println("Training population size");
-//            for (int i = 0; i < popsize.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                DifferentialEvolution de = new DifferentialEvolution(50, popsize[i], 10, 0.1, net, trainData);
-//                System.out.println("population size: " + popsize[i]);
-//                de.run();
-//            }
-//            System.out.println("");
-//            System.out.println("----------");
-//            System.out.println("Training beta");
-//            
-//            for (int i = 0; i < betas.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                DifferentialEvolution de = new DifferentialEvolution(50, 250, betas[i], 0.1, net, trainData);
-//                DifferentialEvolution de2 = new DifferentialEvolution(50, 250, betas[i], 0.05, net, trainData);
-//                System.out.println("beta: " + betas[i] + ", Pr  = 0.1");
-//                de.run();
-//                System.out.println("beta: " + betas[i] + ", Pr = 0.05");
-//                de2.run();
-//            }//ideal settings: population size of 100 or 250,
-            //beta of 25
-            //Pr of 0.1
-//            System.out.println("");
-//            System.out.println("----------");
-//            System.out.println("Training Pr");
-//            for (int i = 0; i < prs.length; i++) {
-//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//                DifferentialEvolution de = new DifferentialEvolution(50, 250, 10, prs[i], net, trainData);
-//                System.out.println("Pr: " + prs[i]);
-//                de.run();
-//            }
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
 
-            //Monica changed from 
-            DifferentialEvolution de = new DifferentialEvolution(1000, 100, 25, 0.1, net, trainData, filePathOut);
+            DifferentialEvolution de = new DifferentialEvolution(10000, 100, 25, 0.1, net, trainData, filePathOut);
             net = de.run(0.01);
             ArrayList<Double> error = runTestData(testData, net);
 
@@ -366,7 +353,7 @@ public class RunModels {
             }
 
             System.out.println("Generations: " + de.genCount);
-
+            System.out.println("DE finished for " + keyWord + " dataset");
         } else {
             System.exit(0);
         }
