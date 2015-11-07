@@ -11,11 +11,9 @@ public class GA extends TrainingStrategy {
 	// mutation rate
 	private double mRate;
 	// number of generations
-	private int gens;
+	private int maxGens;
 	// population size
 	private int popSize;
-	// pts = 5 -> 5-point crossover
-	private int pts;
 	// percent of pop to replace in each generation
 	private double repl;
 	// number of parents for crossover
@@ -28,32 +26,30 @@ public class GA extends TrainingStrategy {
 	private FeedForwardANN net;
 	// training set
 	private ArrayList<TrainingInstance> trainingSet;
+	// acceptable level of error
+	private double epsilon = 0.00001;
 
 	/**
 	 * Creates a new GA instance
 	 * 
-	 * @param cRate
-	 *            crossover rate between 0 and 1
 	 * @param mRate
 	 *            mutation rate between 0 and 1
-	 * @param gens
-	 *            number of generations
+	 * @param maxGens
+	 *            maximum number of generations optimization is allowed to run
 	 * @param pop
 	 *            population size
-	 * @param pts
-	 *            number of points for cross over (e.g. pts = 5 -> 5-point
-	 *            crossover)
 	 * @param repl
 	 *            percentage of population to replace each generation, between 0
 	 *            and 1
+	 * @param numParents
+	 * 			  number of parents for crossover, must be at least 2
 	 */
-	public GA(double mRate, int gens, int popSize, int pts, double repl) {
-		// this.cRate = cRate;
+	public GA(double mRate, int gens, int popSize, double repl, int numParents) {
 		this.mRate = mRate;
-		this.gens = gens;
+		this.maxGens = gens;
 		this.popSize = popSize;
-		this.pts = pts;
 		this.repl = repl;
+		this.numParents = numParents;
 
 	}
 
@@ -66,14 +62,14 @@ public class GA extends TrainingStrategy {
 	}
 
 	/**
-	 * Calls optimizer on weights of the given neural net
+	 * Calls optimizer on weights of the given neural net, returns weighted net
 	 */
-	protected void optimize(FeedForwardANN net) {
+	protected FeedForwardANN optimize(FeedForwardANN net) {
 		this.net = net;
 
 		initPopulation();
 
-		run();
+		return run();
 	}
 	
 	/**
@@ -84,16 +80,17 @@ public class GA extends TrainingStrategy {
 	}
 
 	/**
-	 * Runs optimization
+	 * Runs optimization and returns parameterized net
 	 */
-	private void run() {
+	@SuppressWarnings("unchecked")
+	private FeedForwardANN run() {
 		System.out.println("--------------- STARTING! ---------------");
 		System.out.println("Initial fitness: " + (pop.get(pop.size()-1)).getFitness());
 		System.out.println("Initial error: " + (pop.get(pop.size()-1)).getAvgError());
 		
 		// runs for specified number of generations
-		for (int g = 0; g < gens; g++) {
-			System.out.println("> Generation " + g);
+		for (int g = 0; g < maxGens; g++) {
+			//System.out.println("> Generation " + g);
 			// sorts population in ascending order
 			// lower index -> lower 1/error -> higher error -> lower fitness
 			Collections.sort(pop);
@@ -115,7 +112,7 @@ public class GA extends TrainingStrategy {
 				// step 3: mutate() offspring
 				mutate(offspring);
 
-				// step 4: evaluate offspring
+				// step 4: evaluate() offspring
 				offspring.evaluate();
 
 				newGen.add(offspring);
@@ -126,15 +123,34 @@ public class GA extends TrainingStrategy {
 			for (int i = 0; i < newGen.size(); i++){
 				pop.set(i, newGen.get(i));
 			}
+			
+			if(checkTerminationCriterion()){
+				System.out.println("TERMINATED");
+				System.out.println("Took " + g + " generations");
+				break;
+			}
 		}
 		
 		Collections.sort(pop);
 		
-		// TODO: return fittest
 		System.out.println("--------------- FINISHED!---------------");
 		System.out.println("Final fitness: " + (pop.get(pop.size()-1)).getFitness());
 		System.out.println("Final error: " + (pop.get(pop.size()-1)).getAvgError());
+		
+		(pop.get(pop.size()-1)).evaluate();
+		net.print();
+		return net;
 
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean checkTerminationCriterion(){
+		Collections.sort(pop);
+		if((pop.get(pop.size()-1)).getAvgError() < epsilon){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -230,14 +246,6 @@ public class GA extends TrainingStrategy {
 	// below here are just getters and setters
 	//
 
-	// public double getcRate() {
-	// return cRate;
-	// }
-	//
-	// public void setcRate(double cRate) {
-	// this.cRate = cRate;
-	// }
-
 	public double getmRate() {
 		return mRate;
 	}
@@ -247,11 +255,11 @@ public class GA extends TrainingStrategy {
 	}
 
 	public int getGens() {
-		return gens;
+		return maxGens;
 	}
 
 	public void setGens(int gens) {
-		this.gens = gens;
+		this.maxGens = gens;
 	}
 
 	public int getPopSize() {
@@ -260,14 +268,6 @@ public class GA extends TrainingStrategy {
 
 	public void setPopSize(int popSize) {
 		this.popSize = popSize;
-	}
-
-	public int getPts() {
-		return pts;
-	}
-
-	public void setPts(int pts) {
-		this.pts = pts;
 	}
 
 	public double getRepl() {
