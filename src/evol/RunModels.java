@@ -151,10 +151,18 @@ public class RunModels {
 
             System.out.println("Output Data: " + filePathOut);
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             GA ga = new GA(0.5, 100, 50, 0.25, 3);
             ga.setTrainingSet(trainData);
-            ga.optimize(net);
+            net = ga.optimize(net);
+            
+            ArrayList<Double> error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                System.out.println("i: " + i + ", error: " + error.get(i));
+            }
         } else if (choice.equals("es")) {
             System.out.println("Training with Evolution Strategy");
             // gets the os for the computer this program is run on
@@ -474,6 +482,7 @@ public class RunModels {
         for (int i = 0; i < testData.size(); i++) {
             net.clearInputs();
             net.setInputs(testData.get(i).getInputs());
+            net.setTargetOutputs(testData.get(i).getOutput());
             net.generateOutput();
             error.add(net.calcNetworkError());
         }
