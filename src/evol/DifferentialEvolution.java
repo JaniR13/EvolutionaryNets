@@ -123,10 +123,12 @@ public class DifferentialEvolution extends TrainingStrategy {
             writer.write("Final fitness: " + best.getFitness());
             writer.println();
             writer.write("Final error: " + best.getAvgError());
-
+            writer.println();
+            writer.write("Training completed");
+            writer.println();
             writer.close();
         }
-        
+
         best.evaluate();
         return net;
     }

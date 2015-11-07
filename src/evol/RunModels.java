@@ -233,7 +233,7 @@ public class RunModels {
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             //net.print();
-            EvolutionStrategy es = new EvolutionStrategy(1000, 50, 100, 4, net, trainData, filePathOut);
+            EvolutionStrategy es = new EvolutionStrategy(10000, 50, 100, 4, net, trainData, filePathOut);
             net = es.run(0.0001);
             //net.print();
             ArrayList<Double> error = runTestData(testData, net);
@@ -242,7 +242,7 @@ public class RunModels {
             for (int i = 0; i < error.size(); i++) {
                 System.out.println("i: " + i + ", error: " + error.get(i));
             }
-            
+
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
@@ -285,7 +285,7 @@ public class RunModels {
 
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
-            filePathOut += File.separator + keyWord + "ESOut.txt";
+            filePathOut += File.separator + keyWord + "DEOut.txt";
 
             System.out.println("Output Data: " + filePathOut);
 
@@ -330,15 +330,40 @@ public class RunModels {
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
 
+            //Monica changed from 
             DifferentialEvolution de = new DifferentialEvolution(1000, 100, 25, 0.1, net, trainData, filePathOut);
             net = de.run(0.01);
             ArrayList<Double> error = runTestData(testData, net);
 
-            System.out.println("Generations: " + de.genCount);
-            for (int i = 0; i < error.size(); i++) {
-                System.out.println("i: " + i + ", error: " + error.get(i));
+            PrintWriter printWriter = null;
+
+            File file = new File(filePathOut);
+
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+                printWriter.append("Begin test data");
+                for (int i = 0; i < error.size(); i++) {
+                    printWriter.append("Test instance: " + i + ", error: " + error.get(i));
+                    printWriter.println();
+                }
+
+             } catch (IOException ioex) {
+                ioex.printStackTrace();
+            } finally {
+                if (printWriter != null) {
+                    printWriter.flush();
+                    printWriter.close();
+                }
             }
-            
+
+            System.out.println("Generations: " + de.genCount);
+//            for (int i = 0; i < error.size(); i++) {
+//                System.out.println("i: " + i + ", error: " + error.get(i));
+//            }
+
         } else {
             System.exit(0);
         }

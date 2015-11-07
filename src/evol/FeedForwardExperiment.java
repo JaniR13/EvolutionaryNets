@@ -44,10 +44,10 @@ public class FeedForwardExperiment {
         testExamplesFromFile(filePathTest);
 
         //normalizes the training outputs(
-        normalizeTrainOutputs();
+        //normalizeTrainOutputs();
 
         // normalizes the testing outputs
-        normalizeTestOutputs();
+        //normalizeTestOutputs();
 
         // create training net
         createTrainingNet();
