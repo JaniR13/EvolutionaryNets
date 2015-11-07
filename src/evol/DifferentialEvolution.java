@@ -37,7 +37,7 @@ public class DifferentialEvolution extends TrainingStrategy {
         this.net = net;
         this.trainingSet = trainingSet;
     }
-    public Chromosome run(double conf){
+    public FeedForwardANN run(double conf){
         //initialize the population
         initPop();
         //determine starting fitness
@@ -77,7 +77,8 @@ public class DifferentialEvolution extends TrainingStrategy {
         System.out.println("--------------- FINISHED!---------------");
 	System.out.println("Final fitness: " + best.getFitness());
 	System.out.println("Final error: " + best.getAvgError());
-        return best;
+        best.evaluate();
+        return net;
     }
     //randomly initialize the population
     private void initPop() {
