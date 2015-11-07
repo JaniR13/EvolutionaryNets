@@ -126,7 +126,8 @@ public class EvolutionStrategy extends TrainingStrategy {
             }
             //cut the lambda least fit children from the population
             prunePop(lambda);
-            err = returnBest().getAvgError();
+            best = returnBest();
+            err = best.getAvgError();
             genCount++;
         }
         //determine best child
