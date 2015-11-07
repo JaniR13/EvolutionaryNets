@@ -19,7 +19,11 @@ public class ESChromosome {
     //variance array for the chromosome
     private Double[] varMatrix;
     private Random rand = new Random();
-
+    
+    /**
+     * Creates a new ESChromosome
+     * @param c new chromosome
+     */
     public ESChromosome(Chromosome c) {
         this.c = c;
         int numGenes = c.getNumGenes();
@@ -29,7 +33,8 @@ public class ESChromosome {
             varMatrix[i] = rand.nextGaussian();
         }
     }
-
+    
+    //getter and setter methods
     public void evaluateFitness() {
         c.evaluate();
     }

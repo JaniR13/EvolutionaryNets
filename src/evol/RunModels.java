@@ -199,11 +199,35 @@ public class RunModels {
             filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "Out.txt";
 
-            System.out.println("Output Data: " + filePathOut);
-            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            EvolutionStrategy es = new EvolutionStrategy(50, 5, 5, 2, net, trainData);
-            es.run();
+//            System.out.println("Output Data: " + filePathOut);
+//            int[] numGens = {5, 10, 25, 50, 100, 300, 500, 800, 1000};
+//            for (int i = 0; i < numGens.length; i++) {//Tune number of generations
+//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//                EvolutionStrategy es = new EvolutionStrategy(numGens[i], 5, 5, 2, net, trainData);
+//                System.out.println("number of generations: " + numGens[i]);
+//                es.run();
+//            }//100-300 is best number of generations
+            int[] popsize = {2, 5, 10, 25, 50, 100};
+            for (int i = 0; i < popsize.length; i++) {//Tune number of generations
+                for (int j = 0; j < popsize.length; j++) {
+                    if (i <= j) {
+                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+                        EvolutionStrategy es = new EvolutionStrategy(50, popsize[i], popsize[j], 2, net, trainData);//TODO use best results of previous tuning
+                        System.out.println("population size: " + popsize[i] + ", generation size: " + popsize[j]);
+                        es.run();
+                    }
+                }
+            }
+//            int[] rhosize = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+//            for (int i = 0; i < rhosize.length; i++) {
+//                ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//                EvolutionStrategy es = new EvolutionStrategy(100, 5, 5, rhosize[i], net, trainData);//TODO use best results of previous tuning
+//                System.out.println("rho size: " + rhosize[i]);
+//                es.run();
+//            }
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
@@ -354,7 +378,7 @@ public class RunModels {
             e.printStackTrace();
         }
         System.out.println("Done reading in training data");
-        
+
         return data;
     }
 

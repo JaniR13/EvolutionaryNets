@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class DifferentialEvolution extends TrainingStrategy {
+    //number of generations
     private int gens;
+    //population size
     private int popSize;
+    //beta adjusts size of mutation
     private double beta;
+    //pr is crossover rate
     private double pr;
     private FeedForwardANN net;
     private ArrayList <Chromosome> pop = new ArrayList<Chromosome>();
@@ -14,6 +18,16 @@ public class DifferentialEvolution extends TrainingStrategy {
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
     
+    
+    /**
+     * Creates a new Differential Evolution instance
+     * @param gens number of generations
+     * @param popSize population size
+     * @param beta mutation adjustment parameter
+     * @param pr crossover rate
+     * @param net net to train on
+     * @param trainingSet training data
+    */
     public DifferentialEvolution(int gens, int popSize, double beta, double pr, 
             FeedForwardANN net, ArrayList<TrainingInstance> trainingSet){
         this.gens = gens;
@@ -24,44 +38,51 @@ public class DifferentialEvolution extends TrainingStrategy {
         this.trainingSet = trainingSet;
     }
     public Chromosome run(){
+        //initialize the population
         initPop();
+        //determine starting fitness
         Chromosome best = returnBest();
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
         System.out.println("Initial error: " + best.getAvgError());
         for(int g = 0; g < gens; g++){
-            System.out.println("> Generation " + g);
+            //System.out.println("> Generation " + g);
+            //generate a child for each member of the population
             for(int p = 0; p < popSize; p++){
+                //determine fitness of parent
                 pop.get(p).evaluate();
                 double fitparent = pop.get(p).getFitness();
+                //create a trial vector
                 Chromosome trialvect = new Chromosome(net, trainingSet);
+                //mutate trial vector
                 trialvect = mutation(trialvect, pop.get(p));
+                //new child is recombination of trialvector and parent
                 trialvect = crossover(trialvect, pop.get(p));
+                //determine fitness of child
                 trialvect.evaluate();
                 double fitchild = trialvect.getFitness();
+                //replace the parent with the child if the child has better fitness
                 if(fitchild > fitparent){
                     pop.set(p, trialvect);
                 }
             }
         }
+        //return the best individual
         best = returnBest();
         System.out.println("--------------- FINISHED!---------------");
 	System.out.println("Final fitness: " + best.getFitness());
 	System.out.println("Final error: " + best.getAvgError());
         return best;
     }
-    
-    private void initPop(){
-        Chromosome input = new Chromosome(net, trainingSet);
-        numGenes = input.getNumGenes();
-        for(int i = 0; i < popSize; i++){
-            pop.add(input);
-            for(int j = 0; j < numGenes; j++){
-                pop.get(i).setGene(j, rand.nextDouble());
-            }
-            input = new Chromosome(net, trainingSet);
+    //randomly initialize the population
+    private void initPop() {
+        for (int i = 0; i < popSize; i++) {
+            Chromosome de = new Chromosome(net, trainingSet);
+            pop.add(de);
         }
+        numGenes = pop.get(0).getNumGenes();
     }
+    //trial vector = parent  + beta*(difference between 2 random parents
     private Chromosome mutation(Chromosome child, Chromosome parent){
         Chromosome p2 = pop.get(rand.nextInt(popSize));
         Chromosome p3 = pop.get(rand.nextInt(popSize));
@@ -86,6 +107,7 @@ public class DifferentialEvolution extends TrainingStrategy {
         return child1;
     }
     private Chromosome returnBest(){
+        //loop through population and find the best child
         double highFit = pop.get(0).getFitness();
         int highIndex = 0;
         for(int i = 0; i < pop.size(); i++){
@@ -97,6 +119,8 @@ public class DifferentialEvolution extends TrainingStrategy {
         }
         return pop.get(highIndex);
     }
+    
+    //getter and setter methods
     public int getGens() {
         return gens;
     }

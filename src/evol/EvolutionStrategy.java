@@ -25,8 +25,14 @@ public class EvolutionStrategy extends TrainingStrategy {
     private ArrayList<TrainingInstance> trainingSet;
 
     /**
-     * Each member of the population will need: a Chromosome, and a variance
-     * matrix
+     * Creates a new evolution strategy instance
+     * 
+     * @param gens number of generations
+     * @param mu population size
+     * @param lambda generation size (number of children)
+     * @param rho number of parents in crossover
+     * @param net net to train on
+     * @param trainingSet training data
      */
     public EvolutionStrategy(int gens, int mu, int lambda, int rho,  FeedForwardANN net,
             ArrayList<TrainingInstance> trainingSet) {
@@ -38,7 +44,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.trainingSet = trainingSet;
         
     }
-
+//Randomly initializes the population
     private void initPop() {
         for (int i = 0; i < mu; i++) {
             ESChromosome es = new ESChromosome(new Chromosome(net, trainingSet));
@@ -48,30 +54,38 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     public ESChromosome run() {
-
+//initialize population
         initPop();
+        //determine best element
         ESChromosome best = returnBest();
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
         System.out.println("Initial error: " + best.getAvgError());
+        //Array of size rho for the making children
         ESChromosome[] pool = new ESChromosome[rho];
         // runs for specified number of generations
+        
         for (int g = 0; g < gens; g++) {
-            System.out.println("> Generation " + g);
+            //System.out.println("> Generation " + g);
             for (int l = 0; l < lambda; l++) {
+                //generate a random child
                 ESChromosome yl = new ESChromosome(new Chromosome(net, trainingSet));
+                //select parents
                 pool = marriage(pool);
-
+                //recombine parameters and genes
                 yl = recombineParams(pool, yl);
                 yl = recombineC(pool, yl);
-
+                //mutate parameters and genes
                 yl = mutateParams(yl);
                 yl = mutateC(yl);
+                //add child to population
                 yl.evaluateFitness();
                 pop.add(yl);
             }
+            //cut the lambda least fit children from the population
             prunePop(lambda);
         }
+        //determine best child
         best = returnBest();
         System.out.println("--------------- FINISHED!---------------");
 	System.out.println("Final fitness: " + best.getFitness());
@@ -82,6 +96,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     private ESChromosome returnBest() {
         double highFit = pop.get(0).getFitness();
         int highIndex = 0;
+        // loop through population and find highest fitness
         for (int i = 0; i < pop.size(); i++) {
             double curFit = pop.get(i).getFitness();
             if (curFit > highFit) {
@@ -93,8 +108,9 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private void prunePop(int pruneBy) {
-
+        //
         for (int i = 0; i < pruneBy; i++) {
+            //loop through population and cut lowest individual a certain number of times
             double lowfit = pop.get(0).getFitness();
             int lowIndex = 0;
             for (int j = 1; j < pop.size(); j++) {
@@ -109,6 +125,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome[] marriage(ESChromosome[] pool) {
+        //randomly select rho individuals for making babies
         for (int i = 0; i < rho; i++) {
             pool[i] = pop.get(rand.nextInt(mu));
         }
@@ -116,6 +133,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome mutateC(ESChromosome start) {
+        //add a random number (gaussian) to each gene in an individual
         Double[] newGenes = start.getGenes();
         for (int i = 0; i < numGenes; i++) {
             newGenes[i] += start.getVar(i) * rand.nextGaussian();
@@ -125,6 +143,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome recombineC(ESChromosome[] pool, ESChromosome child) {
+        //select a random parent to pull each gene from
         for (int i = 0; i < numGenes; i++) {
             child.setGene(i, pool[rand.nextInt(rho)].getGene(i));
         }
@@ -132,6 +151,8 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome mutateParams(ESChromosome start) {
+        //mutate the parameters by following the equation:
+        //new parameter = old parameter* e^((TauOverall*Gaussian) + (TauIndividual * Gaussian))
         Double[] newVar = start.getVarMatrix();
         for (int i = 0; i < numGenes; i++) {
             double r1 = rand.nextGaussian();
@@ -143,13 +164,14 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     private ESChromosome recombineParams(ESChromosome[] pool, ESChromosome child) {
+        //select gene from random parent
         for (int i = 0; i < numGenes; i++) {
             child.setVar(i, pool[rand.nextInt(rho)].getVar(i));
         }
         return child;
 
     }
-
+    //getter and setter methods
     public void setTrainingSet(ArrayList<TrainingInstance> trainingSet) {
         this.trainingSet = trainingSet;
     }
