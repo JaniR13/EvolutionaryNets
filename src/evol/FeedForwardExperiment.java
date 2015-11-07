@@ -90,6 +90,7 @@ public class FeedForwardExperiment {
 //        for (int i = 0; i < errors.size(); i++) {
 //            System.out.println(errors.get(i));
 //        }
+        
         writer.close();
 
         System.out.println(

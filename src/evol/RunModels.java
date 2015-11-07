@@ -21,7 +21,7 @@ public class RunModels {
 
         //gives the user a series of choices
         System.out.println("Please pick from one of the following options");
-        System.out.println("To convert output files 'con'");
+        System.out.println("To convert a single data file into input and output files 'con'");
         System.out.println("To run the feed-forward neural net (with backprop) type 'ffnn'");
         System.out.println("To train the neural net with a genetic algorithm type 'ga'");
         System.out.println("To train the neural net with an evolution strategy type 'es'");
@@ -152,7 +152,7 @@ public class RunModels {
             System.out.println("Output Data: " + filePathOut);
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            GA ga = new GA(0.5, 100, 50, 3, 0.25);
+            GA ga = new GA(0.5, 100, 50, 0.25, 3);
             ga.setTrainingSet(trainData);
             ga.optimize(net);
         } else if (choice.equals("es")) {
@@ -197,7 +197,7 @@ public class RunModels {
 
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
-            filePathOut += File.separator + keyWord + "Out.txt";
+            filePathOut += File.separator + keyWord + "ESOut.txt";
 
 //            System.out.println("Output Data: " + filePathOut);
 //            int[] numGens = {5, 10, 25, 50, 100, 300, 500, 800, 1000};
@@ -233,10 +233,11 @@ public class RunModels {
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             //net.print();
-            EvolutionStrategy es = new EvolutionStrategy(1000, 50, 100, 4, net, trainData);
+            EvolutionStrategy es = new EvolutionStrategy(1000, 50, 100, 4, net, trainData, filePathOut);
             net = es.run(0.0001);
             //net.print();
             ArrayList<Double> error = runTestData(testData, net);
+
             System.out.println("Generations: " + es.genCount);
             for (int i = 0; i < error.size(); i++) {
                 System.out.println("i: " + i + ", error: " + error.get(i));
@@ -284,7 +285,7 @@ public class RunModels {
 
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
-            filePathOut += File.separator + keyWord + "Out.txt";
+            filePathOut += File.separator + keyWord + "ESOut.txt";
 
             System.out.println("Output Data: " + filePathOut);
 
@@ -328,9 +329,11 @@ public class RunModels {
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            DifferentialEvolution de = new DifferentialEvolution(1000, 100, 25, 0.1, net, trainData);
+
+            DifferentialEvolution de = new DifferentialEvolution(1000, 100, 25, 0.1, net, trainData, filePathOut);
             net = de.run(0.01);
             ArrayList<Double> error = runTestData(testData, net);
+
             System.out.println("Generations: " + de.genCount);
             for (int i = 0; i < error.size(); i++) {
                 System.out.println("i: " + i + ", error: " + error.get(i));

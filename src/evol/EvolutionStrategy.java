@@ -35,8 +35,9 @@ public class EvolutionStrategy extends TrainingStrategy {
      * @param net net to train on
      * @param trainingSet training data
      */
+
     public EvolutionStrategy(int gens, int mu, int lambda, int rho, FeedForwardANN net,
-            ArrayList<TrainingInstance> trainingSet) {
+            ArrayList<TrainingInstance> trainingSet, String filePathOut) {
         this.net = net;
         this.lambda = lambda;
         this.mu = mu;
@@ -56,7 +57,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     public FeedForwardANN run(double conf) {
-//initialize population
+        //initialize population
         initPop();
         //determine best element
         ESChromosome best = returnBest();

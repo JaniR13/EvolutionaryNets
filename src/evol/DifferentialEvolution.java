@@ -1,9 +1,13 @@
 package evol;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class DifferentialEvolution extends TrainingStrategy {
+
     //number of generations
     private int gens;
     //population size
@@ -12,46 +16,82 @@ public class DifferentialEvolution extends TrainingStrategy {
     private double beta;
     //pr is crossover rate
     private double pr;
+
     private FeedForwardANN net;
-    private ArrayList <Chromosome> pop = new ArrayList<Chromosome>();
+    private ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
     private Random rand = new Random();
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
+    private String filePathOut;
     public int genCount;
-    
+
     /**
      * Creates a new Differential Evolution instance
+     *
      * @param gens number of generations
      * @param popSize population size
      * @param beta mutation adjustment parameter
      * @param pr crossover rate
      * @param net net to train on
      * @param trainingSet training data
-    */
-    public DifferentialEvolution(int gens, int popSize, double beta, double pr, 
-            FeedForwardANN net, ArrayList<TrainingInstance> trainingSet){
+     * @param filePathOut the output location for the specified file
+     */
+    public DifferentialEvolution(int gens, int popSize, double beta, double pr,
+            FeedForwardANN net, ArrayList<TrainingInstance> trainingSet, String filePathOut) {
         this.gens = gens;
         this.popSize = popSize;
         this.beta = beta;
         this.pr = pr;
         this.net = net;
         this.trainingSet = trainingSet;
+        this.filePathOut = filePathOut;
     }
-    public FeedForwardANN run(double conf){
+
+    public FeedForwardANN run(double conf) {
         //initialize the population
         initPop();
         //determine starting fitness
         Chromosome best = returnBest();
         double err = best.getAvgError();
+
+        PrintWriter writer = null;
+
+        //constructs output file
+        try {
+            writer = new PrintWriter(filePathOut);
+        } catch (FileNotFoundException e1) {
+            // Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        System.out.println("Would you like to print sample runs for this dataset? Type y for yes, n for no.");
+        Scanner in = new Scanner(System.in);
+        String choice = "";
+        choice = in.nextLine();
+
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
         System.out.println("Initial error: " + err);
+
+        if (choice.equals("y")) {
+            writer.write("Initial fitness: " + best.getFitness());
+            writer.println();
+            writer.write("Initial error: " + err);
+            writer.println();
+        }
+
         genCount = 0;
-        while(err > conf && genCount < gens){
-        //for(int g = 0; g < gens; g++){
-            //System.out.println("> Generation " + g);
+        while (err > conf && genCount < gens) {
+            if (choice.equals("y")) {
+                // outputs the fitness and error at each generation
+                writer.write("Fitness at generation " + genCount + " :" + best.getFitness());
+                writer.println();
+                writer.write("Error at generation " + genCount + " :" + err);
+                writer.println();
+            }
+
             //generate a child for each member of the population
-            for(int p = 0; p < popSize; p++){
+            for (int p = 0; p < popSize; p++) {
                 //determine fitness of parent
                 pop.get(p).evaluate();
                 double fitparent = pop.get(p).getFitness();
@@ -65,7 +105,7 @@ public class DifferentialEvolution extends TrainingStrategy {
                 trialvect.evaluate();
                 double fitchild = trialvect.getFitness();
                 //replace the parent with the child if the child has better fitness
-                if(fitchild > fitparent){
+                if (fitchild > fitparent) {
                     pop.set(p, trialvect);
                 }
             }
@@ -75,11 +115,22 @@ public class DifferentialEvolution extends TrainingStrategy {
         //return the best individual
         best = returnBest();
         System.out.println("--------------- FINISHED!---------------");
-	System.out.println("Final fitness: " + best.getFitness());
-	System.out.println("Final error: " + best.getAvgError());
+
+        System.out.println("Final fitness: " + best.getFitness());
+        System.out.println("Final error: " + best.getAvgError());
+
+        if (choice.equals("y")) {
+            writer.write("Final fitness: " + best.getFitness());
+            writer.println();
+            writer.write("Final error: " + best.getAvgError());
+
+            writer.close();
+        }
+        
         best.evaluate();
         return net;
     }
+
     //randomly initialize the population
     private void initPop() {
         for (int i = 0; i < popSize; i++) {
@@ -88,44 +139,47 @@ public class DifferentialEvolution extends TrainingStrategy {
         }
         numGenes = pop.get(0).getNumGenes();
     }
+
     //trial vector = parent  + beta*(difference between 2 random parents
-    private Chromosome mutation(Chromosome child, Chromosome parent){
+    private Chromosome mutation(Chromosome child, Chromosome parent) {
         Chromosome p2 = pop.get(rand.nextInt(popSize));
         Chromosome p3 = pop.get(rand.nextInt(popSize));
-        for(int i = 0; i < numGenes; i++){
-            double adj = parent.getGene(i)+ beta*(p2.getGene(i) - p3.getGene(i));
+        for (int i = 0; i < numGenes; i++) {
+            double adj = parent.getGene(i) + beta * (p2.getGene(i) - p3.getGene(i));
             child.setGene(i, adj);
         }
         return child;
     }
-    private Chromosome crossover(Chromosome child, Chromosome parent){//Binomial crossover
+
+    private Chromosome crossover(Chromosome child, Chromosome parent) {//Binomial crossover
         Chromosome child1 = new Chromosome(net, trainingSet);
         int jstar = rand.nextInt(numGenes);
         child1.setGene(jstar, child.getGene(jstar));
-        for(int j = 1; j < numGenes; j++){
+        for (int j = 1; j < numGenes; j++) {
             double rando = rand.nextDouble();
-            if(rando < pr && j != jstar){
+            if (rando < pr && j != jstar) {
                 child1.setGene(j, child.getGene(j));
-            }else{
+            } else {
                 child1.setGene(j, parent.getGene(j));
             }
         }
         return child1;
     }
-    private Chromosome returnBest(){
+
+    private Chromosome returnBest() {
         //loop through population and find the best child
         double highFit = pop.get(0).getFitness();
         int highIndex = 0;
-        for(int i = 0; i < pop.size(); i++){
+        for (int i = 0; i < pop.size(); i++) {
             double curFit = pop.get(i).getFitness();
-            if(curFit > highFit){
+            if (curFit > highFit) {
                 highIndex = i;
                 highFit = curFit;
             }
         }
         return pop.get(highIndex);
     }
-    
+
     //getter and setter methods
     public int getGens() {
         return gens;
