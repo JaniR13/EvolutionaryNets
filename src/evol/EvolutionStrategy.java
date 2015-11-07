@@ -1,7 +1,10 @@
 package evol;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class EvolutionStrategy extends TrainingStrategy {
 
@@ -23,6 +26,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     private Random rand = new Random();
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
+    private String filePathOut;
     public int genCount;
 
     /**
@@ -34,6 +38,7 @@ public class EvolutionStrategy extends TrainingStrategy {
      * @param rho number of parents in crossover
      * @param net net to train on
      * @param trainingSet training data
+     * @param filePathOut the output location for the specified file
      */
     public EvolutionStrategy(int gens, int mu, int lambda, int rho,  FeedForwardANN net,
             ArrayList<TrainingInstance> trainingSet, String filePathOut) {
@@ -43,6 +48,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.rho = rho;
         this.gens = gens;
         this.trainingSet = trainingSet;
+        this.filePathOut = filePathOut;
 
     }
 //Randomly initializes the population
@@ -61,15 +67,46 @@ public class EvolutionStrategy extends TrainingStrategy {
         //determine best element
         ESChromosome best = returnBest();
         double err = best.getAvgError();
+
+        PrintWriter writer = null;
+
+        //constructs output file
+        try {
+            writer = new PrintWriter(filePathOut);
+        } catch (FileNotFoundException e1) {
+            // Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        System.out.println("Would you like to print sample runs for this dataset? Type y for yes, n for no.");
+        Scanner in = new Scanner(System.in);
+        String choice = "";
+        choice = in.nextLine();
+
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
         System.out.println("Initial error: " + err);
+
+        if (choice.equals("y")) {
+            writer.write("Initial fitness: " + best.getFitness());
+            writer.println();
+            writer.write("Initial error: " + err);
+            writer.println();
+        }
+
         genCount = 0;
         //Array of size rho for the making children
         ESChromosome[] pool = new ESChromosome[rho];
         while (err > conf && genCount < gens) {
+            if (choice.equals("y")) {
+                // outputs the fitness and error at each generation
+                writer.write("Fitness at generation " + genCount + " :" + best.getFitness());
+                writer.println();
+                writer.write("Error at generation " + genCount + " :" + err);
+                writer.println();
+            }
 
-        // runs for specified number of generations
+            // runs for specified number of generations
             // for (int g = 0; g < gens; g++) {
             //System.out.println("> Generation " + g);
             for (int l = 0; l < lambda; l++) {
@@ -98,6 +135,17 @@ public class EvolutionStrategy extends TrainingStrategy {
         System.out.println("Final fitness: " + best.getFitness());
         System.out.println("Final error: " + best.getAvgError());
         best.evaluateFitness();
+        
+        if (choice.equals("y")) {
+            writer.write("Final fitness: " + best.getFitness());
+            writer.println();
+            writer.write("Final error: " + best.getAvgError());
+            writer.println();
+            writer.write("Training completed");
+            writer.println();
+            writer.close();
+        }
+
         return net;
     }
 
@@ -181,7 +229,6 @@ public class EvolutionStrategy extends TrainingStrategy {
     }
 
     //getter and setter methods
-
     public void setTrainingSet(ArrayList<TrainingInstance> trainingSet) {
         this.trainingSet = trainingSet;
     }

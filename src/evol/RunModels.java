@@ -2,14 +2,13 @@ package evol;
 /*
  * The class that contains the main method. From here user can call a method to 
  * convert a dataset to test and training sets, or test/train a FFNN with backpropagation. 
- * Additionally, the user can choose one of three evolutionary approaches to train
- * the weights for the FFNN. 
+ * Additionally, the user can choose one of three evolutionary approaches (GA, ES and 
+ * DE) to train the weights for the FFNN. 
  */
 
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-
 import java.util.*;
 
 public class RunModels {
@@ -213,6 +212,7 @@ public class RunModels {
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             EvolutionStrategy es = new EvolutionStrategy(10000, 10, 10, 2, net, trainData, filePathOut);
+
             net = es.run(0.0001);
             //net.print();
             ArrayList<Double> error = runTestData(testData, net);
@@ -221,6 +221,11 @@ public class RunModels {
             for (int i = 0; i < error.size(); i++) {
                 System.out.println("i: " + i + ", error: " + error.get(i));
             }
+
+            es.run(0.01);
+
+            System.out.println("Generations: " + es.genCount);
+            System.out.println("ES finished for " + keyWord + " dataset");
 
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
@@ -263,6 +268,7 @@ public class RunModels {
             keyWord = in.nextLine();
 
             System.out.println("Select location where you would like to save your output files.");
+
             String filePathOut1 = getFileLocation();
 
             int[] popsize = {50, 100, 250, 500};

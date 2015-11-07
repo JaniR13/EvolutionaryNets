@@ -120,6 +120,8 @@ public class DifferentialEvolution extends TrainingStrategy {
         System.out.println("Final fitness: " + best.getFitness());
         System.out.println("Final error: " + best.getAvgError());
 
+        best.evaluate();
+        
         if (choice.equals("y")) {
             writer.write("Final fitness: " + best.getFitness());
             writer.println();
@@ -130,16 +132,13 @@ public class DifferentialEvolution extends TrainingStrategy {
             writer.close();
         }
 
-        best.evaluate();
         return net;
-
 
     }
 
 
-
-//randomly initialize the population
-private void initPop() {
+    //randomly initialize the population
+    private void initPop() {
         for (int i = 0; i < popSize; i++) {
             Chromosome de = new Chromosome(net, trainingSet);
             pop.add(de);
