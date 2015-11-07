@@ -149,8 +149,8 @@ private void initPop() {
 
     //trial vector = parent  + beta*(difference between 2 random parents
     private Chromosome mutation(Chromosome child, Chromosome parent) {
-        Chromosome p2 = pop.get(rand.nextInt(popSize));
-        Chromosome p3 = pop.get(rand.nextInt(popSize));
+        Chromosome p2 = pop.get((int)(Math.random() * popSize));
+        Chromosome p3 = pop.get((int)(Math.random() * popSize));
         for (int i = 0; i < numGenes; i++) {
             double adj = parent.getGene(i) + beta * (p2.getGene(i) - p3.getGene(i));
             child.setGene(i, adj);
@@ -160,10 +160,10 @@ private void initPop() {
 
     private Chromosome crossover(Chromosome child, Chromosome parent) {//Binomial crossover
         Chromosome child1 = new Chromosome(net, trainingSet);
-        int jstar = rand.nextInt(numGenes);
+        int jstar = (int)(Math.random() * numGenes);
         child1.setGene(jstar, child.getGene(jstar));
         for (int j = 1; j < numGenes; j++) {
-            double rando = rand.nextDouble();
+            double rando = Math.random();
             if (rando < pr && j != jstar) {
                 child1.setGene(j, child.getGene(j));
             } else {
