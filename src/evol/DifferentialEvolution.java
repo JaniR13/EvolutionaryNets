@@ -111,16 +111,18 @@ public class DifferentialEvolution extends TrainingStrategy {
                 }
             }
            best = returnBest();
+           best.evaluate();
            err = best.getAvgError();
             genCount++;
         }
         //return the best individual
         best = returnBest();
+        best.evaluate();
         System.out.println("--------------- FINISHED!---------------");
         System.out.println("Final fitness: " + best.getFitness());
         System.out.println("Final error: " + best.getAvgError());
 
-        best.evaluate();
+        
         
         if (choice.equals("y")) {
             writer.write("Final fitness: " + best.getFitness());

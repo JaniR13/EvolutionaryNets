@@ -208,8 +208,8 @@ public class RunModels {
 
 //            int[] popsize = {10, 25, 50, 100};
 //            int[] rhosize = {2, 3, 4, 5};
-            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-            ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
+            ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
+            ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
             EvolutionStrategy es = new EvolutionStrategy(10000, 10, 10, 2, net, trainData, filePathOut);
 
@@ -280,8 +280,8 @@ public class RunModels {
 
                         filePathOut = filePathOut1 + File.separator + keyWord + j + "" + k + "" + l + "DEOut.txt";
                         System.out.println("Output Data: " + filePathOut);
-                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-                        ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
+                        ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
+                        ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
                         FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
 
                         //Monica changed from 
@@ -434,4 +434,58 @@ public class RunModels {
         return error;
     }
 
+    public static ArrayList<TrainingInstance> normalizeTrainOutputs(ArrayList<TrainingInstance> trainoutputs) {
+        ArrayList<TrainingInstance> norm = new ArrayList<TrainingInstance>();
+        // adds all outputs to a new arraylist
+        for (int i = 0; i < trainoutputs.size(); i++) {
+            norm.add(trainoutputs.get(i));
+        }
+        Double maxOut = norm.get(0).getOutput().get(0);
+        Double maxIn = norm.get(0).getInputs().get(0);
+        Double minOut = norm.get(0).getOutput().get(0);
+        Double minIn = norm.get(0).getInputs().get(0);
+        int outsize = norm.get(0).getOutput().size();
+        int insize = norm.get(0).getInputs().size();
+        for (int i = 0; i < norm.size(); i++) { //for each training instance
+            TrainingInstance inst = norm.get(i);
+            ArrayList<Double> out = inst.getOutput();
+            ArrayList<Double> in = inst.getInputs();
+            for (int j = 0; j < out.size(); j++) {
+                Double curOut = out.get(j);
+                if (curOut > maxOut) {
+                    maxOut = curOut;
+                }
+                if (curOut < minOut) {
+                    minOut = curOut;
+                }
+            }
+            for (int j = 0; j < in.size(); j++) {
+                Double curIn = in.get(j);
+                if (curIn > maxIn) {
+                    maxIn = curIn;
+                }
+                if (curIn < minIn) {
+                    minIn = curIn;
+                }
+            }
+        }
+        for (int i = 0; i < norm.size(); i++) { //for each training instance
+            ArrayList<Double> newout = new ArrayList<Double>();
+            ArrayList<Double> newin = new ArrayList<Double>();
+            ArrayList<Double> oldout = norm.get(i).getOutput();
+            ArrayList<Double> oldin = norm.get(i).getInputs();
+            for (int j = 0; j < outsize; j++) {
+                Double newval = (oldout.get(j) - minOut) / (maxOut - minOut);
+                newout.add(newval);
+            }
+            for (int j = 0; j < insize; j++) {
+                Double newval = (oldin.get(j) - minIn) / (maxIn - minIn);
+                newin.add(newval);
+            }
+            norm.get(i).setInputs(newin);
+            norm.get(i).setOutput(newout);
+        }
+        return norm;
+//        
+    }
 }
