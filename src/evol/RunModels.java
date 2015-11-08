@@ -226,6 +226,29 @@ public class RunModels {
 
             System.out.println("Generations: " + es.genCount);
             System.out.println("ES finished for " + keyWord + " dataset");
+            PrintWriter printWriter = null;
+
+            File file = new File(filePathOut);
+
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+                //printWriter.append("Begin test data");
+                for (int i = 0; i < error.size(); i++) {
+                    printWriter.append(i + ", " + error.get(i));
+                    printWriter.println();
+                }
+
+            } catch (IOException ioex) {
+                ioex.printStackTrace();
+            } finally {
+                if (printWriter != null) {
+                    printWriter.flush();
+                    printWriter.close();
+                }
+            }
 
         } else if (choice.equals("de")) {
             System.out.println("Training with Differential Evolution");
@@ -298,9 +321,9 @@ public class RunModels {
                                 file.createNewFile();
                             }
                             printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
-                            printWriter.append("Begin test data");
+                            //printWriter.append("Begin test data");
                             for (int i = 0; i < error.size(); i++) {
-                                printWriter.append("Test instance: " + i + ", error: " + error.get(i));
+                                printWriter.append(i + ", " + error.get(i));
                                 printWriter.println();
                             }
 
