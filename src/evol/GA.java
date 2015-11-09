@@ -27,7 +27,7 @@ public class GA extends TrainingStrategy {
 	// training set
 	private ArrayList<TrainingInstance> trainingSet;
 	// acceptable level of error
-	private double epsilon = 0.00001;
+	private double epsilon = 0.0001;
 
 	/**
 	 * Creates a new GA instance

@@ -27,6 +27,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     private int numGenes;
     private ArrayList<TrainingInstance> trainingSet;
     private String filePathOut;
+    public Double eta;
     public int genCount;
 
     /**
@@ -49,7 +50,6 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.gens = gens;
         this.trainingSet = trainingSet;
         this.filePathOut = filePathOut;
-
     }
 //Randomly initializes the population
 
@@ -64,6 +64,7 @@ public class EvolutionStrategy extends TrainingStrategy {
     public FeedForwardANN run(double conf) {
         //initialize population
         initPop();
+        
         //determine best element
         ESChromosome best = returnBest();
         double err = best.getAvgError();
@@ -78,14 +79,15 @@ public class EvolutionStrategy extends TrainingStrategy {
             e1.printStackTrace();
         }
 
-        System.out.println("Would you like to print sample runs for this dataset? Type y for yes, n for no.");
+        //System.out.println("Would you like to print sample runs for this dataset? Type y for yes, n for no.");
         Scanner in = new Scanner(System.in);
         String choice = "";
         choice = in.nextLine();
-
+        
         System.out.println("--------------- STARTING! ---------------");
         System.out.println("Initial fitness: " + best.getFitness());
         System.out.println("Initial error: " + err);
+
 
         if (choice.equals("y")) {
             writer.write("mu: " + mu + ", lambda: "+ lambda + ", rho: " + rho);
@@ -93,6 +95,7 @@ public class EvolutionStrategy extends TrainingStrategy {
 //            writer.write("Initial error: " + err);
 //            writer.println();
         }
+
 
         genCount = 0;
         //Array of size rho for the making children

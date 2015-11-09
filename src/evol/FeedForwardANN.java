@@ -29,7 +29,7 @@ import java.util.ArrayList;
 		private ActivationFunction f;
 
 		//learning rate, a tunable parameter
-		private double eta = .4;
+		public double eta;
 		//tunable parameter that allows to include momentum, if desired
 		private boolean momentum;
 		//the value for the momentum term
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 		 */
 		public FeedForwardANN(int hiddenLayers, int numHiddenNodesPerLayer,
 			ArrayList<Double> inputs, ArrayList<Double> targetOutputs,
-			boolean logistic, boolean momemtum) {
+			boolean logistic, boolean momemtum, Double eta) {
 			this.layers = hiddenLayers + 2;
 			outputs = new ArrayList<Double>();
 			nodes = new ArrayList<ArrayList<Neuron>>();
@@ -58,7 +58,8 @@ import java.util.ArrayList;
 			this.inputs = inputs;
 			this.numOutputs = targetOutputs.size();
 			this.momentum = momentum;
-
+                        this.eta = eta;
+                        
 			//Determines if activation function is linear activation function or 
 			//sigmoidal activation function (in this case, logistic)
 			if (logistic) {
@@ -124,7 +125,7 @@ import java.util.ArrayList;
 		/** Performs the training of the ANN */		
 		protected ArrayList<Double> train() {		
 			generateOutput();
-			
+		
 			//print();
 			
 			int count = 0;
@@ -369,11 +370,11 @@ import java.util.ArrayList;
 			for (int l = 0; l < layers; l++) {
 				// for each node in the layer:
 				for (int n = 0; n < nodes.get(l).size(); n++) {
-					System.out.print(nodes.get(l).get(n).toString());
+					//System.out.print(nodes.get(l).get(n).toString());
 				}
-				System.out.println();
+				//System.out.println();
 			}
-			System.out.println();
+			//System.out.println();
 		}
 		
 		public void setInputs(ArrayList<Double> newInputs){

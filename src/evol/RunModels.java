@@ -98,12 +98,83 @@ public class RunModels {
             keyWord = in.nextLine();
 
             System.out.println("Select location where you would like to save your output files.");
-            filePathOut = getFileLocation();
+            //filePathOut = getFileLocation();
             filePathOut += File.separator + keyWord + "Out.txt";
+            filePathOut += File.separator + keyWord;
 
             System.out.println("Output Data: " + filePathOut);
 
-            FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut);
+            //the ffnn settings decided on after the tuning process
+            Boolean momentum = false;
+            int numHiddenNodes = 5;
+            Double eta = 0.6;
+            FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+
+            //for tuning algorithm
+//            String filePath1 = "";
+//            filePath1 += filePathOut + "1.txt";
+//            String filePath2 = "";
+//            filePath2 += filePathOut + "2.txt";
+//            String filePath3 = "";
+//            filePath3 += filePathOut + "3.txt";
+//            String filePath4 = "";
+//            filePath4 += filePathOut + "4.txt";
+//            String filePath5 = "";
+//            filePath5 += filePathOut + "5.txt";
+//            String filePath6 = "";
+//            filePath6 += filePathOut + "6.txt";
+//            String filePath7 = "";
+//            filePath7 += filePathOut + "7.txt";
+//            String filePath8 = "";
+//            filePath8 += filePathOut + "8.txt";
+//            String filePath9 = "";
+//            filePath9 += filePathOut + "9.txt";
+//
+//            filePathOut = filePath1;
+//            Boolean momentum = false;
+//            int numHiddenNodes = 5;
+//            Double eta = 0.2;
+//            FeedForwardExperiment test1 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath2;
+//            numHiddenNodes = 5;
+//            eta = .4;
+//            FeedForwardExperiment test2 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath3;
+//            numHiddenNodes = 5;
+//            eta = .6;
+//            FeedForwardExperiment test3 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath4;
+//            numHiddenNodes = 10;
+//            eta = .2;
+//            FeedForwardExperiment test4 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath5;
+//            numHiddenNodes = 10;
+//            eta = .4;
+//            FeedForwardExperiment test5 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath6;
+//            numHiddenNodes = 10;
+//            eta = .6;
+//            FeedForwardExperiment test6 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath7;
+//            numHiddenNodes = 20;
+//            eta = .2;
+//            FeedForwardExperiment test7 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath8;
+//            numHiddenNodes = 20;
+//            eta = .4;
+//            FeedForwardExperiment test8 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
+//
+//            filePathOut = filePath9;
+//            numHiddenNodes = 20;
+//            eta = .6;
+//            FeedForwardExperiment test9 = new FeedForwardExperiment(filePathTrain, filePathTest, filePathOut, momentum, numHiddenNodes, eta);
         } else if (choice.equals("ga")) {
             System.out.println("Training with Genetic Algorithm");
             // gets the os for the computer this program is run on
@@ -149,10 +220,46 @@ public class RunModels {
             filePathOut += File.separator + keyWord + "Out.txt";
 
             System.out.println("Output Data: " + filePathOut);
+
+            PrintWriter writer = null;
+
+            //constructs output file
+            try {
+                writer = new PrintWriter(filePathOut);
+            } catch (FileNotFoundException e1) {
+                // Auto-generated catch block
+                e1.printStackTrace();
+            }
+
+            //variables for ffnn
+            Boolean momentum = true;
+            int numHiddenNodes = 5;
+            Double eta = 0.6;
+
+            //variables for GA
+            Double mutationRate;  //in first place
+            int popSize;       //in third place
+            Double replace;       //in fourth place
+            int numParents;       //in fifth place
+
+            //what we are not varying for this round
+            //mutationRate = .25;
+            //numParents = 5;
+            //popSize = 100;
+            replace = .75;
+            
+            
+            //what we are varying
+            //1
+            mutationRate = .10;
+            popSize = 25;
+            //replace = .25;
+            numParents = 2;
+            //mutationRate = .25;
             ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
             ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
-            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            GA ga = new GA(0.5, 100, 50, 0.25, 3);
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            GA ga = new GA(mutationRate, 1000, popSize, replace, numParents);
             ga.setTrainingSet(trainData);
             net = ga.optimize(net);
 
@@ -160,8 +267,915 @@ public class RunModels {
 
             //System.out.println("Generations: " + es.genCount);
             for (int i = 0; i < error.size(); i++) {
-                System.out.println("i: " + i + ", error: " + error.get(i));
+                writer.write(error.get(i).toString());
+                writer.println();
             }
+
+            //2
+            //popSize = 25;
+            //replace = .50;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //3
+            //popSize = 25;
+            //replace = .75;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //4
+            //popSize = 50;
+            //replace = .25;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //5
+            popSize = 50;
+            //replace = .5;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //6
+            //popSize = 25;
+            //replace = .5;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //7
+            //mutationRate = .25;
+            //popSize = 25;
+            //replace = .25;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //8
+            //popSize = 25;
+            //replace = .5;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //9
+            popSize = 100;
+            //replace = .75;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //10
+            //mutationRate = .25;
+            //popSize = 25;
+            //replace = .5;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //11
+            //popSize = 25;
+            //replace = .5;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //12
+            //popSize = 25;
+            //replace = .75;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //13
+            mutationRate = .25;
+            popSize = 25;
+            //replace = .25;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //14
+            //popSize = 50;
+            //replace = .5;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //15
+            //popSize = 50;
+            //replace = .75;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //16
+            //popSize = 100;
+            //replace = .25;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //17
+            //popSize = 50;
+            replace = .5;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //18
+            //popSize = 50;
+            //replace = .75;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            System.out.println("Halfway through!");
+
+            //19
+            //mutationRate = .5;
+            //popSize = 25;
+            //replace = .25;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //20
+            //popSize = 50;
+            //replace = .5;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //21
+            popSize = 75;
+            //replace = .75;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //22
+            //popSize = 50;
+            //replace = .25;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //23
+            //popSize = 50;
+            //replace = .5;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //24
+            //popSize = 50;
+            //replace = .75;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //25
+            mutationRate = .5;
+            popSize = 25;
+            //replace = .25;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //26
+            //popSize = 100;
+            //replace = .5;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //27
+            //popSize = 100;
+            //replace = .75;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //28
+            //mutationRate = .75;
+            //popSize = 25;
+            //replace = .25;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //29
+            popSize = 50;
+            //replace = .5;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //30
+            //popSize = 100;
+            //replace = .75;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //31
+//            popSize = 50;
+//            replace = .25;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //32
+            //popSize = 100;
+            //replace = .5;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //33
+            popSize = 75;
+            //replace = .75;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //34
+            //popSize = 100;
+            //replace = .25;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+            System.out.println("Two left");
+
+            //35
+            //popSize = 100;
+            //replace = .5;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //36
+            //popSize = 100;
+            //replace = .75;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //37
+            mutationRate = .75;
+            popSize = 25;
+            //replace = .25;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //38
+            //popSize = 100;
+            //replace = .75;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //39
+            //popSize = 100;
+            //replace = .75;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //40
+            //popSize = 100;
+            //replace = .75;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //41
+            popSize = 50;
+            //replace = .5;
+            numParents = 2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //42
+            //popSize = 100;
+            //replace = .5;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //43
+            //popSize = 100;
+            //replace = .75;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //44
+            //popSize = 100;
+            //replace = .75;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //45
+            popSize = 100;
+            //replace = .75;
+            numParents =2;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //46
+            //popSize = 100;
+            //replace = .75;
+            numParents = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //47
+            //popSize = 100;
+            //replace = .75;
+            numParents = 4;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            //48
+            //popSize = 100;
+            //replace = .75;
+            numParents = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            ga = new GA(mutationRate, 1000, popSize, replace, numParents);
+            ga.setTrainingSet(trainData);
+            net = ga.optimize(net);
+
+            error = runTestData(testData, net);
+
+            //System.out.println("Generations: " + es.genCount);
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+            writer.close();
+
         } else if (choice.equals("es")) {
             System.out.println("Training with Evolution Strategy");
             // gets the os for the computer this program is run on
@@ -204,142 +1218,457 @@ public class RunModels {
 
             System.out.println("Select location where you would like to save your output files.");
             filePathOut = getFileLocation();
-            filePathOut += File.separator + keyWord + "ESOut.txt";
 
+            PrintWriter writer = null;
+
+            //filePathOut += File.separator + keyWord + "ESOut.txt";
 //            int[] popsize = {10, 25, 50, 100};
 //            int[] rhosize = {2, 3, 4, 5};
-            ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
-            ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
-            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-            EvolutionStrategy es = new EvolutionStrategy(10000, 10, 10, 2, net, trainData, filePathOut);
 
-            net = es.run(0.0001);
-            //net.print();
+            filePathOut += File.separator + keyWord;
+
+            String filePath1 = "";
+            filePath1 += filePathOut + ".txt";
+
+            //constructs output file
+            try {
+                writer = new PrintWriter(filePath1);
+            } catch (FileNotFoundException e1) {
+                // Auto-generated catch block
+                e1.printStackTrace();
+            }
+
+            Boolean momentum = true;
+            int numHiddenNodes = 5;
+            Double eta = 0.6;
+            int numGenerations = 1000;
+
+            //the variable being varied
+            int mu = 100;
+            int lambda = 100;
+            int rho = 2;
+
+            filePathOut = filePath1;
+            //varying this next
+//            int mu = 10;
+//            int lambda = 10;
+            //int rho = 2;
+            ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+            ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
+            EvolutionStrategy es;
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+
+            //net = es.run(0.0001);
             ArrayList<Double> error = runTestData(testData, net);
 
-            System.out.println("Generations: " + es.genCount);
             for (int i = 0; i < error.size(); i++) {
-                System.out.println("i: " + i + ", error: " + error.get(i));
+                writer.write(error.get(i).toString());
+                writer.println();
             }
 
-            es.run(0.01);
+            //filePathOut = filePath2;
+            //lambda = 25;
+            rho = 3;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+            net = es.run(0.0001);
+            error = runTestData(testData, net);
 
+//<<<<<<< Updated upstream
+//            System.out.println("Generations: " + es.genCount);
+//            System.out.println("ES finished for " + keyWord + " dataset");
+//            PrintWriter printWriter = null;
+//
+//            File file = new File(filePathOut);
+//
+//            try {
+//                if (!file.exists()) {
+//                    file.createNewFile();
+//                }
+//                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+//                //printWriter.append("Begin test data");
+//                for (int i = 0; i < error.size(); i++) {
+//                    printWriter.append(i + ", " + error.get(i));
+//                    printWriter.println();
+//                }
+//
+//            } catch (IOException ioex) {
+//                ioex.printStackTrace();
+//            } finally {
+//                if (printWriter != null) {
+//                    printWriter.flush();
+//                    printWriter.close();
+//                }
+//=======
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//>>>>>>> Stashed changes
+//            }
+
+//            filePathOut = filePath3;
+            rho = 4;
+            //lambda = 50;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+            net = es.run(0.0001);
+            error = runTestData(testData, net);
+
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+//            filePathOut = filePath4;
+            //lambda = 100;
+            rho = 5;
+            trainData = createTrainingInstance(filePathTrain);
+            testData = createTrainingInstance(filePathTest);
+            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+            net = es.run(0.0001);
+            error = runTestData(testData, net);
+
+            for (int i = 0; i < error.size(); i++) {
+                writer.write(error.get(i).toString());
+                writer.println();
+            }
+
+//            //filePathOut = filePath5;
+////            lambda = 25;
+//            mu = 25;
+//            lambda = 10;
+//            //rho = 2;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath6;
+//            lambda = 25;
+//            //rho = 3;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath7;
+//            lambda = 50;
+//            //rho = 4;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath8;
+//            lambda = 100;
+//            //rho = 5;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            System.out.println("Halfway done!");
+//
+//            //filePathOut = filePath9;
+//            mu = 50;
+//            lambda = 10;
+//            //rho = 2;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath10;
+//            lambda = 25;
+//            //rho = 3;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //  filePathOut = filePath11;
+//            lambda = 50;
+//            //rho = 4;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath12;
+//            lambda = 100;
+//            //rho = 5;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath13;
+//            mu = 100;
+//            lambda = 10;
+//            //rho = 2;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath14;
+//            lambda = 25;
+//            //rho = 3;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//            System.out.println("Two more left!");
+//
+//            //filePathOut = filePath15;
+//            lambda = 50;
+//            //rho = 4;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//
+//            //filePathOut = filePath16;
+//            lambda = 100;
+//            //rho = 5;
+//            trainData = createTrainingInstance(filePathTrain);
+//            testData = createTrainingInstance(filePathTest);
+//            net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
+//            es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
+//            net = es.run(0.0001);
+//            error = runTestData(testData, net);
+//
+//            for (int i = 0; i < error.size(); i++) {
+//                writer.write(error.get(i).toString());
+//                writer.println();
+//            }
+//            es.run(0.01);
             System.out.println("Generations: " + es.genCount);
             System.out.println("ES finished for " + keyWord + " dataset");
-            PrintWriter printWriter = null;
 
-            File file = new File(filePathOut);
-
-            try {
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
-                //printWriter.append("Begin test data");
-                for (int i = 0; i < error.size(); i++) {
-                    printWriter.append(i + ", " + error.get(i));
-                    printWriter.println();
-                }
-
-            } catch (IOException ioex) {
-                ioex.printStackTrace();
-            } finally {
-                if (printWriter != null) {
-                    printWriter.flush();
-                    printWriter.close();
-                }
-            }
-
+//<<<<<<< Updated upstream
+//            String filePathOut1 = getFileLocation();
+//
+//            int[] popsize = {50, 100, 250, 500};
+//            double[] betas = {1, 5, 10, 25};//gotta be honest, I have no idea what a good range is for this
+//            double[] prs = {0.01, 0.05, 0.1, 0.5};
+//            for (int j = 0; j < popsize.length; j++) {
+//                for (int k = 0; k < betas.length; k++) {
+//                    for (int l = 0; l < prs.length; l++) {
+//
+//                        filePathOut = filePathOut1 + File.separator + keyWord + j + "" + k + "" + l + "DEOut.txt";
+//                        System.out.println("Output Data: " + filePathOut);
+//                        ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
+//                        ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
+//                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//
+//                        //Monica changed from 
+//                        DifferentialEvolution de = new DifferentialEvolution(1000, popsize[j], betas[k], prs[l], net, trainData, filePathOut);
+//                        net = de.run(0.001);
+//                        ArrayList<Double> error = runTestData(testData, net);
+//
+//                        PrintWriter printWriter = null;
+//
+//                        File file = new File(filePathOut);
+//
+//                        try {
+//                            if (!file.exists()) {
+//                                file.createNewFile();
+//                            }
+//                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+//                            //printWriter.append("Begin test data");
+//                            for (int i = 0; i < error.size(); i++) {
+//                                printWriter.append(i + ", " + error.get(i));
+//                                printWriter.println();
+//                            }
+//
+//                        } catch (IOException ioex) {
+//                            ioex.printStackTrace();
+//                        } finally {
+//                            if (printWriter != null) {
+//                                printWriter.flush();
+//                                printWriter.close();
+//                            }
+//                        }
+//
+//                        System.out.println("Generations: " + de.genCount);
+//                    }
+//                }
+//            }
+//=======
+            writer.close();
         } else if (choice.equals("de")) {
-            System.out.println("Training with Differential Evolution");
-            // gets the os for the computer this program is run on
-            String os = System.getProperty("os.name").toLowerCase();
-            // gets the home location
-            String home = System.getProperty("user.home");
-            // starts building the file path
-            String filePathTrain = home;
-            String filePathTest = home;
-            String keyWord = "";
-            //String to hold the filepath of the entire dataset
-            String filePathOut = "";
+//            System.out.println("Training with Differential Evolution");
+//            // gets the os for the computer this program is run on
+//            String os = System.getProperty("os.name").toLowerCase();
+//            // gets the home location
+//            String home = System.getProperty("user.home");
+//            // starts building the file path
+//            String filePathTrain = home;
+//            String filePathTest = home;
+//            String keyWord = "";
+//            //String to hold the filepath of the entire dataset
+//            String filePathOut = "";
+//
+//            // uses file separator so is operating system agnostic
+//            if (os.startsWith("windows")) { // Windows
+//                filePathTrain += File.separator;
+//                filePathTest += File.separator;
+//                filePathOut += File.separator;
+//            } else if (os.startsWith("mac")) { // Mac
+//                filePathTrain += File.separator;
+//                filePathTest += File.separator;
+//                filePathOut += File.separator;
+//            } else {
+//                // everything else
+//                filePathTrain += File.separator;
+//                filePathTest += File.separator;
+//                filePathOut += File.separator;
+//            }
+//
+//            // calls the file chooser, returns the updated file path
+//            System.out.println("Select Training Data Location");
+//            filePathTrain = callFileChooser(filePathTrain);
+//            System.out.println("Training Data: " + filePathTrain);
+//            System.out.println("Select Test Data Location");
+//            filePathTest = callFileChooser(filePathTest);
+//            System.out.println("Test Data: " + filePathTest);
+//
+//            System.out.println("Enter the keyword you would like to use to label your output files.");
+//            keyWord = in.nextLine();
+//
+//            System.out.println("Select location where you would like to save your output files.");
+//
+//            String filePathOut1 = getFileLocation();
+//
+//            int[] popsize = {50, 100, 250, 500};
+//            double[] betas = {1, 5, 10, 25};//gotta be honest, I have no idea what a good range is for this
+//            double[] prs = {0.01, 0.05, 0.1, 0.5};
+//            for (int j = 0; j < popsize.length; j++) {
+//                for (int k = 0; k < betas.length; k++) {
+//                    for (int l = 0; l < prs.length; l++) {
+//
+//                        filePathOut = filePathOut1 + File.separator + keyWord + j + "" + k + "" + l + "DEOut.txt";
+//                        System.out.println("Output Data: " + filePathOut);
+//                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
+//                        ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
+//                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
+//
+//                        DifferentialEvolution de = new DifferentialEvolution(1000, popsize[j], betas[k], prs[l], net, trainData, filePathOut);
+//                        net = de.run(0.001);
+//                        ArrayList<Double> error = runTestData(testData, net);
+//
+//                        PrintWriter printWriter = null;
+//
+//                        File file = new File(filePathOut);
+//
+//                        try {
+//                            if (!file.exists()) {
+//                                file.createNewFile();
+//                            }
+//                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+//                            printWriter.append("Begin test data");
+//                            for (int i = 0; i < error.size(); i++) {
+//                                printWriter.append("Test instance: " + i + ", error: " + error.get(i));
+//                                printWriter.println();
+//                            }
+//
+//                        } catch (IOException ioex) {
+//                            ioex.printStackTrace();
+//                        } finally {
+//                            if (printWriter != null) {
+//                                printWriter.flush();
+//                                printWriter.close();
+//                            }
+//                        }
+//
+//                        System.out.println("Generations: " + de.genCount);
+//                    }
+//                }
+//            }
 
-            // uses file separator so is operating system agnostic
-            if (os.startsWith("windows")) { // Windows
-                filePathTrain += File.separator;
-                filePathTest += File.separator;
-                filePathOut += File.separator;
-            } else if (os.startsWith("mac")) { // Mac
-                filePathTrain += File.separator;
-                filePathTest += File.separator;
-                filePathOut += File.separator;
-            } else {
-                // everything else
-                filePathTrain += File.separator;
-                filePathTest += File.separator;
-                filePathOut += File.separator;
-            }
-
-            // calls the file chooser, returns the updated file path
-            System.out.println("Select Training Data Location");
-            filePathTrain = callFileChooser(filePathTrain);
-            System.out.println("Training Data: " + filePathTrain);
-            System.out.println("Select Test Data Location");
-            filePathTest = callFileChooser(filePathTest);
-            System.out.println("Test Data: " + filePathTest);
-
-            System.out.println("Enter the keyword you would like to use to label your output files.");
-            keyWord = in.nextLine();
-
-            System.out.println("Select location where you would like to save your output files.");
-
-            String filePathOut1 = getFileLocation();
-
-            int[] popsize = {50, 100, 250, 500};
-            double[] betas = {1, 5, 10, 25};//gotta be honest, I have no idea what a good range is for this
-            double[] prs = {0.01, 0.05, 0.1, 0.5};
-            for (int j = 0; j < popsize.length; j++) {
-                for (int k = 0; k < betas.length; k++) {
-                    for (int l = 0; l < prs.length; l++) {
-
-                        filePathOut = filePathOut1 + File.separator + keyWord + j + "" + k + "" + l + "DEOut.txt";
-                        System.out.println("Output Data: " + filePathOut);
-                        ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
-                        ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
-                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-
-                        //Monica changed from 
-                        DifferentialEvolution de = new DifferentialEvolution(1000, popsize[j], betas[k], prs[l], net, trainData, filePathOut);
-                        net = de.run(0.001);
-                        ArrayList<Double> error = runTestData(testData, net);
-
-                        PrintWriter printWriter = null;
-
-                        File file = new File(filePathOut);
-
-                        try {
-                            if (!file.exists()) {
-                                file.createNewFile();
-                            }
-                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
-                            //printWriter.append("Begin test data");
-                            for (int i = 0; i < error.size(); i++) {
-                                printWriter.append(i + ", " + error.get(i));
-                                printWriter.println();
-                            }
-
-                        } catch (IOException ioex) {
-                            ioex.printStackTrace();
-                        } finally {
-                            if (printWriter != null) {
-                                printWriter.flush();
-                                printWriter.close();
-                            }
-                        }
-
-                        System.out.println("Generations: " + de.genCount);
-                    }
-                }
-            }
         } else {
             System.exit(0);
         }

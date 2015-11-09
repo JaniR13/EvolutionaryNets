@@ -26,6 +26,9 @@ public class FeedForwardExperiment {
     // number of hidden layers in the network
     int numHidden = 2;
 
+    // number of hidden nodes per layer
+    int numHiddenNodesPerLayer = 5;
+
     //the feed forward artificial neural network used to train/test data
     FeedForwardANN neuralNet;
     FeedForwardANN testNet;
@@ -36,7 +39,14 @@ public class FeedForwardExperiment {
     // network error values
     ArrayList<Double> errors = new ArrayList<Double>();
 
-    public FeedForwardExperiment(String filePathTrain, String filePathTest, String filePathOut) {
+    // PrintWriter writer = null;
+    Boolean momentum = true;
+    Double eta;
+
+    public FeedForwardExperiment(String filePathTrain, String filePathTest, String filePathOut, Boolean inMomentum, int numHiddenNodes, Double inEta) {
+        numHiddenNodesPerLayer = numHiddenNodes;
+        momentum = inMomentum;
+        eta = inEta;
         // feed training data into trainExamplesFromFile, to split into input/output 
         trainExamplesFromFile(filePathTrain);
 
@@ -44,23 +54,24 @@ public class FeedForwardExperiment {
         testExamplesFromFile(filePathTest);
 
         //normalizes the training outputs(
-        //normalizeTrainOutputs();
+        normalizeTrainOutputs();
 
         // normalizes the testing outputs
-        //normalizeTestOutputs();
+        normalizeTestOutputs();
 
         // create training net
         createTrainingNet();
 
         // run test instances through the trained net
         runTestInstances(filePathOut);
+
     }
 
     //runs the test instances on the trained network, prints the error to the
-    //appropriate file
+//appropriate file
     private void runTestInstances(String filePathOut) {
-        PrintWriter writer = null;
         testNet = neuralNet;
+        PrintWriter writer = null;
 
         //constructs output file
         try {
@@ -69,6 +80,9 @@ public class FeedForwardExperiment {
             // Auto-generated catch block
             e1.printStackTrace();
         }
+
+        writer.write("Momentum = " + momentum + ", Learning Rate = " + testNet.eta + ", Num Hidden Nodes per Layer = " + numHiddenNodesPerLayer);
+        writer.println();
 
         // runs through each test example
         for (int i = 0; i < testinputs.size() - 1; i++) {
@@ -87,10 +101,6 @@ public class FeedForwardExperiment {
             writer.println();
         }
 
-//        for (int i = 0; i < errors.size(); i++) {
-//            System.out.println(errors.get(i));
-//        }
-        
         writer.close();
 
         System.out.println(
@@ -102,8 +112,8 @@ public class FeedForwardExperiment {
     //Builds training net with specified parameters
     private void createTrainingNet() {
         //builds a neural net for training
-        neuralNet = new FeedForwardANN(numHidden, 20, traininputs.get(0), trainoutputs.get(0),
-                true, false);
+        neuralNet = new FeedForwardANN(numHidden, numHiddenNodesPerLayer, traininputs.get(0), trainoutputs.get(0),
+                true, false, eta);
 
         // runs through ANN with training example's inputs and outputs
         for (int i = 0; i < traininputs.size(); i++) {
@@ -228,13 +238,10 @@ public class FeedForwardExperiment {
 
                 testinputs.add(inputs);
                 testoutputs.add(output);
-
-                System.out.println("Output size is " + output.size());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Test Output size is " + testoutputs.size());
         System.out.println("Done reading in testing data");
     }
 
