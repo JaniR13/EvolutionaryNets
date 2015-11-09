@@ -179,7 +179,7 @@ public class RunModels {
 
             //Runs the GA for the user provided data set
             ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
-            ArrayList<TrainingInstance> testData =  normalizeTrainOutputs(createTrainingInstance(filePathTest));
+            ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
             GA ga = new GA(mutationRate, 1000, popSize, replace, numParents);
             ga.setTrainingSet(trainData);
@@ -261,7 +261,7 @@ public class RunModels {
             int rho = 4;
 
             ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
-            ArrayList<TrainingInstance> testData =  normalizeTrainOutputs(createTrainingInstance(filePathTest));
+            ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
             FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, momentum, eta);
             EvolutionStrategy es = new EvolutionStrategy(numGenerations, mu, lambda, rho, net, trainData, filePathOut);
             net = es.run(0.0001);
@@ -277,6 +277,7 @@ public class RunModels {
 
             writer.close();
         } else if (choice.equals("de")) {
+            //gets the information for the DE 
             System.out.println("Training with Differential Evolution");
             // gets the os for the computer this program is run on
             String os = System.getProperty("os.name").toLowerCase();
@@ -288,7 +289,7 @@ public class RunModels {
             String keyWord = "";
             //String to hold the filepath of the entire dataset
             String filePathOut = "";
-//
+
             // uses file separator so is operating system agnostic
             if (os.startsWith("windows")) { // Windows
                 filePathTrain += File.separator;
@@ -304,7 +305,7 @@ public class RunModels {
                 filePathTest += File.separator;
                 filePathOut += File.separator;
             }
-//
+
             // calls the file chooser, returns the updated file path
             System.out.println("Select Training Data Location");
             filePathTrain = callFileChooser(filePathTrain);
@@ -319,52 +320,42 @@ public class RunModels {
             System.out.println("Select location where you would like to save your output files.");
 
             String filePathOut1 = getFileLocation();
-//
-//            int[] popsize = {50, 100, 250, 500};
-//            double[] betas = {1, 5, 10, 25};//gotta be honest, I have no idea what a good range is for this
-//            double[] prs = {0.01, 0.05, 0.1, 0.5};
-//            for (int j = 0; j < popsize.length; j++) {
-//                for (int k = 0; k < betas.length; k++) {
-//                    for (int l = 0; l < prs.length; l++) {
-//
-                        filePathOut = filePathOut1 + File.separator + keyWord + "DEOut.txt";
-                        System.out.println("Output Data: " + filePathOut);
-                        ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
-                        ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
-                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false, 0.6);
 
-                        DifferentialEvolution de = new DifferentialEvolution(500, 50, 1, 0.05, net, trainData, filePathOut);
-                        net = de.run(0.05);
-                        ArrayList<Double> error = runTestData(testData, net);
+            filePathOut = filePathOut1 + File.separator + keyWord + "DEOut.txt";
+            System.out.println("Output Data: " + filePathOut);
+            ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
+            ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
+            FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false, 0.6);
 
-                        PrintWriter printWriter = null;
+            DifferentialEvolution de = new DifferentialEvolution(500, 50, 1, 0.05, net, trainData, filePathOut);
+            net = de.run(0.05);
+            ArrayList<Double> error = runTestData(testData, net);
 
-                        File file = new File(filePathOut);
+            PrintWriter printWriter = null;
 
-                        try {
-                            if (!file.exists()) {
-                                file.createNewFile();
-                            }
-                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
-                            //printWriter.append("Begin test data");
-                            for (int i = 0; i < error.size(); i++) {
-                                printWriter.append(""+error.get(i));
-                                printWriter.println();
-                            }
+            File file = new File(filePathOut);
 
-                        } catch (IOException ioex) {
-                            ioex.printStackTrace();
-                        } finally {
-                            if (printWriter != null) {
-                                printWriter.flush();
-                                printWriter.close();
-                            }
-                        }
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+                //printWriter.append("Begin test data");
+                for (int i = 0; i < error.size(); i++) {
+                    printWriter.append("" + error.get(i));
+                    printWriter.println();
+                }
 
-                        System.out.println("Generations: " + de.genCount);
-//                    }
-//                }
-//            }
+            } catch (IOException ioex) {
+                ioex.printStackTrace();
+            } finally {
+                if (printWriter != null) {
+                    printWriter.flush();
+                    printWriter.close();
+                }
+            }
+
+            System.out.println("Generations: " + de.genCount);
 
         } else {
             System.exit(0);
@@ -430,7 +421,8 @@ public class RunModels {
         filePath = callFileChooser(filePath);
         return filePath;
     }
-
+    
+    //creates a training instance from the data, for use by GA, ES and DE
     public static ArrayList<TrainingInstance> createTrainingInstance(String fname) {
         BufferedReader br = null; // read from data
         String line = "";
@@ -471,6 +463,8 @@ public class RunModels {
         return data;
     }
 
+    //once the ffnn has been trained, runs the test data - constructs an arraylist of errors which 
+    //is printed out in the respective strategy (for GA, DE, ES)    
     public static ArrayList<Double> runTestData(ArrayList<TrainingInstance> testData, FeedForwardANN net) {
         ArrayList<Double> error = new ArrayList<Double>();
         for (int i = 0; i < testData.size(); i++) {
@@ -483,6 +477,7 @@ public class RunModels {
         return error;
     }
 
+    //normalizes the test and training outputs, so they can be used with the activation function
     public static ArrayList<TrainingInstance> normalizeTrainOutputs(ArrayList<TrainingInstance> trainoutputs) {
         ArrayList<TrainingInstance> norm = new ArrayList<TrainingInstance>();
         // adds all outputs to a new arraylist
