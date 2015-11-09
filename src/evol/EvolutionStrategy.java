@@ -51,8 +51,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         this.trainingSet = trainingSet;
         this.filePathOut = filePathOut;
     }
-//Randomly initializes the population
-
+    //Randomly initializes the population
     private void initPop() {
         for (int i = 0; i < mu; i++) {
             ESChromosome es = new ESChromosome(new Chromosome(net, trainingSet));
@@ -148,12 +147,13 @@ public class EvolutionStrategy extends TrainingStrategy {
 //            writer.println();
 //            writer.write("Training completed");
 //            writer.println();
-//            writer.close();
+            writer.close();
 //        }
 
         return net;
     }
 
+    //returns the best fitness in the population
     private ESChromosome returnBest() {
         double highFit = pop.get(0).getFitness();
         int highIndex = 0;
@@ -168,6 +168,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         return pop.get(highIndex);
     }
 
+    //prunes out the individuals in the population with the lowest fitness
     private void prunePop(int pruneBy) {
         //
         for (int i = 0; i < pruneBy; i++) {
@@ -185,6 +186,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         }
     }
 
+    //increases the size of the population
     private ESChromosome[] marriage(ESChromosome[] pool) {
         //randomly select rho individuals for making babies
         for (int i = 0; i < rho; i++) {
@@ -193,6 +195,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         return pool;
     }
 
+    //mutates the genes in a chromosome
     private ESChromosome mutateC(ESChromosome start) {
         //add a random number (gaussian) to each gene in an individual
         Double[] newGenes = start.getGenes();
@@ -203,6 +206,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         return start;
     }
 
+    //recombines the parents chromosomes to produce a child
     private ESChromosome recombineC(ESChromosome[] pool, ESChromosome child) {
         //select a random parent to pull each gene from
         for (int i = 0; i < numGenes; i++) {
@@ -211,6 +215,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         return child;
     }
 
+    //mutates the parameters, making them adaptive as well
     private ESChromosome mutateParams(ESChromosome start) {
         //mutate the parameters by following the equation:
         //new parameter = old parameter* e^((TauOverall*Gaussian) + (TauIndividual * Gaussian))
@@ -224,6 +229,7 @@ public class EvolutionStrategy extends TrainingStrategy {
         return start;
     }
 
+    //recombines the parents chromosomes to produce a child (this time for parameter mutation)
     private ESChromosome recombineParams(ESChromosome[] pool, ESChromosome child) {
         //select gene from random parent
         for (int i = 0; i < numGenes; i++) {
