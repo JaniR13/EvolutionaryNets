@@ -34,7 +34,7 @@ import java.util.ArrayList;
 		//the value for the momentum term
 		private double alpha = .4;
 		//the acceptable level of error for the ANN
-		private double epsilon = .0001;
+		private double epsilon = .01;
 				
 		/**
 		 * Creates a new feed-forward neural network

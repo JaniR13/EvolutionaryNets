@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package evol;
 
 import java.util.Random;
 
-/**
- *
- * @author Janette
+/*
+ * A class to construct the chromosomes used in Evolution Strategy.
  */
 public class ESChromosome {
 
@@ -18,6 +12,7 @@ public class ESChromosome {
     private Chromosome c;
     //variance array for the chromosome
     private Double[] varMatrix;
+    //a random number for variance initialization
     private Random rand = new Random();
     
     /**
@@ -28,7 +23,7 @@ public class ESChromosome {
         this.c = c;
         int numGenes = c.getNumGenes();
         varMatrix = new Double[numGenes];
-        //initialize variance to random Gaussian
+        //initialize variance to random Gaussian, stores in a matrix
         for (int i = 0; i < numGenes; i++) {
             varMatrix[i] = rand.nextGaussian();
         }
