@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+/*
+ *  Uses a Differential Evolution to train weights for a FFNN
+ */
+
 public class DifferentialEvolution extends TrainingStrategy {
 
     //number of generations

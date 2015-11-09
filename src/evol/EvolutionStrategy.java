@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /*
- *  Uses an Evolution Strategy  
+ *  Uses an Evolution Strategy to train weights for a FFNN
  */
 
 public class EvolutionStrategy extends TrainingStrategy {

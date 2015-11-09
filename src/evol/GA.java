@@ -3,6 +3,10 @@ package evol;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/*
+ * A class to train the weights of a FFNN using a GA.
+ */
+
 public class GA extends TrainingStrategy {
 
 	// crossover rate

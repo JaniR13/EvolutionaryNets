@@ -2,9 +2,9 @@ package evol;
 
 public class MeanSquaredError {
 	
-	// TODO: add error for whole network
-	// also possibly constructor
-	
+	// Calculates the mean squared error, in order to determine efficacy 
+        // of network
+    
 	/**
 	 * Calculates the derivative of error with respect to output
 	 * @param output the neuron's output
