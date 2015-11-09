@@ -100,7 +100,7 @@ public class DifferentialEvolution extends TrainingStrategy {
                 //create a trial vector
                 Chromosome trialvect = new Chromosome(net, trainingSet);
                 //mutate trial vector
-                trialvect = mutation(trialvect, pop.get(p));
+                trialvect = mutation(trialvect, pop.get(p), p);
                 //new child is recombination of trialvector and parent
                 trialvect = crossover(trialvect, pop.get(p));
                 //determine fitness of child
@@ -150,11 +150,20 @@ public class DifferentialEvolution extends TrainingStrategy {
     }
 
     //trial vector = parent  + beta*(difference between 2 random parents
-    private Chromosome mutation(Chromosome child, Chromosome parent) {
-        Chromosome p2 = pop.get((int)(Math.random() * popSize));
-        Chromosome p3 = pop.get((int)(Math.random() * popSize));
+   private Chromosome mutation(Chromosome child, Chromosome parent, int index) {
+        int r1 = (int)Math.random() * popSize;
+        int r2 = (int)Math.random() * popSize;
+        int r3 = (int)Math.random() * popSize;
+        while(r1 == index || r2 == index || r1 == r2 || r3 == index || r3 == r1 || r3 == r2){
+            r1 = (int)(Math.random() * popSize);
+            r2 = (int)(Math.random() * popSize);
+            r3 = (int)Math.random() * popSize;
+        }
+        Chromosome p1 = pop.get(r1);
+        Chromosome p2 = pop.get(r2);
+        Chromosome p3 = pop.get(r3);
         for (int i = 0; i < numGenes; i++) {
-            double adj = parent.getGene(i) + beta * (p2.getGene(i) - p3.getGene(i));
+            double adj = p1.getGene(i) + beta * (p2.getGene(i) - p3.getGene(i));
             child.setGene(i, adj);
         }
         return child;
