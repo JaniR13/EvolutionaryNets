@@ -2,30 +2,29 @@ package evol;
 /*
  * A class to construct a Feed Forward Artificial Neural Network (FFNN, hereafter) with 
  * backpropagation learning. The FFANN is multilayer. Number of inputs, 
- * hidden layers, hidden units per layer and output are furnished as inputs to the 
- * program. Also, the type of activation function can be specified, and momentum
+ * hidden layers, hidden units per layer, eta (the learning rate) and output are 
+ * furnished as inputs to the program. Also, the type of activation function can 
+ * be specified, and momentum
  * can be used (if desired). 
  */
 
 
-
 import java.util.ArrayList;
 
-
 	public class FeedForwardANN {
-		//number of hidden layers, per instructions can be 0, 1, 2
+		//number of hidden layers
 		public int layers;
 		//allows the user to specify the desired number of outputs
 		private int numOutputs;
 		//allows the user to specify the desired number of hidden nodes
 		private int numHiddenNodesPerLayer;
 		
-		// TODO: normalize data
 		
 		private ArrayList<Double> outputs;
 		public ArrayList<ArrayList<Neuron>> nodes;
 		private ArrayList<Double> inputs;
 		private ArrayList<Double> targetOutputs;
+                //allows user to choose from 1 of 2 activation functions
 		private ActivationFunction f;
 
 		//learning rate, a tunable parameter
@@ -35,9 +34,8 @@ import java.util.ArrayList;
 		//the value for the momentum term
 		private double alpha = .4;
 		//the acceptable level of error for the ANN
-		private double epsilon = .01;
-		
-		
+		private double epsilon = .0001;
+				
 		/**
 		 * Creates a new feed-forward neural network
 		 * @param hiddenLayers number of hidden layers
@@ -50,7 +48,8 @@ import java.util.ArrayList;
 		public FeedForwardANN(int hiddenLayers, int numHiddenNodesPerLayer,
 			ArrayList<Double> inputs, ArrayList<Double> targetOutputs,
 			boolean logistic, boolean momemtum, Double eta) {
-			this.layers = hiddenLayers + 2;
+			
+                        this.layers = hiddenLayers + 2;
 			outputs = new ArrayList<Double>();
 			nodes = new ArrayList<ArrayList<Neuron>>();
 			this.numHiddenNodesPerLayer = numHiddenNodesPerLayer;
@@ -102,14 +101,7 @@ import java.util.ArrayList;
 				outputs.add(n.calcOutput());
 			}
 
-			// TODO: testing, remove
-//			System.out.println();
-//			System.out.println("Outputs:");
-//			for (int i = 0; i < outputs.size(); i++) {
-//				System.out.println(outputs.get(i));
-//			}
-//			System.out.println();
-			
+		
 			calcNetworkError();
 		}
 		
@@ -135,7 +127,6 @@ import java.util.ArrayList;
 				// 1) output layer
 				int target = 0;
 				for (Neuron n : nodes.get(layers - 1)) {
-					// System.out.println(n.toString());
 					// calculates delta
 					Double d = calcOutputDelta(n, targetOutputs.get(target));
 					// calculates each weight change
@@ -150,9 +141,6 @@ import java.util.ArrayList;
 							n.addWeightChange(calcOutputWeightChangeM(n,d,w));
 							
 						}
-						// n.getWeights().set(w, n.getWeights().get(w) +
-						// calcOutputWeightChange(n, d, w));
-						// System.out.println();
 					}
 					target++;
 				}
@@ -160,25 +148,17 @@ import java.util.ArrayList;
 				// 2) hidden layers
 				for (int layer = (layers - 2); layer > 0; layer--) {
 					for (Neuron n : nodes.get(layer)) {
-						// System.out.println(n.toString());
 						// calculates delta
 						Double d = calcHiddenDelta(n, n.getDepth());
 
 						// calculates each weight change
 						for (int w = 0; w < n.getWeights().size(); w++) {
-							// System.out.println(n.getWeights().get(w) +
-							// " -- Hidden delta: " + d);
-							// System.out.println(n.getWeights().get(w) +
-							// " -- <>w: " + calcHiddenWeightChange(n, d, w));
 							if (!momentum){
 								n.addWeightChange(calcHiddenWeightChange(n, d, w));
 							} else {
 								n.addWeightChange(calcHiddenWeightChangeM(n, d, w));
 
 							}
-							// n.getWeights().set(w, n.getWeights().get(w) +
-							// calcHiddenWeightChange(n, d, w));
-							// System.out.println();
 						}
 					}
 				}

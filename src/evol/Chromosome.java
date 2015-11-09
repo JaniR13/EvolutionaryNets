@@ -3,9 +3,15 @@ package evol;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class Chromosome implements Comparable {
+/*
+ * A class to construct the chromosomes used in Differential Evolution and the
+ * Genetic Algorithm.
+ */
 
+public class Chromosome implements Comparable {
+        //the number of genes in the chromosome
 	private int numGenes;
+        //the 
 	private FeedForwardANN net;
 
 	private Double[] genes;
