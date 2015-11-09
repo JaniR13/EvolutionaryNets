@@ -154,11 +154,7 @@ public class DifferentialEvolution extends TrainingStrategy {
         int r1 = (int)Math.random() * popSize;
         int r2 = (int)Math.random() * popSize;
         int r3 = (int)Math.random() * popSize;
-        while(r1 == index || r2 == index || r1 == r2 || r3 == index || r3 == r1 || r3 == r2){
-            r1 = (int)(Math.random() * popSize);
-            r2 = (int)(Math.random() * popSize);
-            r3 = (int)Math.random() * popSize;
-        }
+        
         Chromosome p1 = pop.get(r1);
         Chromosome p2 = pop.get(r2);
         Chromosome p3 = pop.get(r3);
