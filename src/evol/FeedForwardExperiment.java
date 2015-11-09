@@ -81,8 +81,8 @@ public class FeedForwardExperiment {
             e1.printStackTrace();
         }
 
-        writer.write("Momentum = " + momentum + ", Learning Rate = " + testNet.eta + ", Num Hidden Nodes per Layer = " + numHiddenNodesPerLayer);
-        writer.println();
+        //writer.write("Momentum = " + momentum + ", Learning Rate = " + testNet.eta + ", Num Hidden Nodes per Layer = " + numHiddenNodesPerLayer);
+        //writer.println();
 
         // runs through each test example
         for (int i = 0; i < testinputs.size() - 1; i++) {

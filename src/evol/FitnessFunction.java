@@ -1,7 +1,10 @@
 package evol;
 
 import java.util.ArrayList;
-
+/*
+ * An abstract class for the fitness function for each neural net. In this instance, 
+ * mean squared error (MSE) is used for classification tasks.
+ */
 public class FitnessFunction {
 
 	/** Calculates MSE */
