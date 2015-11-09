@@ -6,7 +6,8 @@ import java.util.Random;
 /*
  * Convert the whole data files into test and training sets. Allows user to
  * pick location of data set, as well as location where they would like to store
- * the output (test and train files).
+ * the output (test and train files). Also allows user to probabilistically trim
+ * down datasets into larger datasets.
  */
 public class ConvertData {
 
@@ -36,7 +37,7 @@ public class ConvertData {
             while ((reader.readLine()) != null) {
                 //generate a random number
                 randomNumber = randInt(0, 100);
-                
+
                 currentLine = reader.readLine();
 
                 //compares these 25 numbers to the random number generated above, so the chance of putting
@@ -53,6 +54,16 @@ public class ConvertData {
                         testWriter.write(currentLine);
                         testWriter.newLine();
                     }
+
+                  //for cutting down size of larger datasets      
+//                } else if (randomNumber == 39 || randomNumber == 22 || randomNumber == 56 || randomNumber == 4
+//                        || randomNumber == 34 || randomNumber == 74 || randomNumber == 61 || randomNumber == 82
+//                        || randomNumber == 69 || randomNumber == 60 || randomNumber == 96 || randomNumber == 91
+//                        || randomNumber == 38 || randomNumber == 35 || randomNumber == 26 || randomNumber == 42
+//                        || randomNumber == 79 || randomNumber == 75 || randomNumber == 71 || randomNumber == 55
+//                        || randomNumber == 43 || randomNumber == 41 || randomNumber == 19 || randomNumber == 65
+//                        || randomNumber == 89) {
+
                 } else {
                     //The chance of putting data in the training set is 75%
                     if (currentLine != null) {

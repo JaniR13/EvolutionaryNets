@@ -11,15 +11,19 @@ import java.util.ArrayList;
 public class Chromosome implements Comparable {
         //the number of genes in the chromosome
 	private int numGenes;
-        //the 
+        //the net that the DE or GA will learn the weights for
 	private FeedForwardANN net;
-
+        //keeps track of all genes in chromosome
 	private Double[] genes;
+        //the fitness for the chromosome
 	private double fitness;
+        //the error for the specified ANN
 	private double networkError;
+        //holds the selected fitness function
 	private FitnessFunction f;
 	private ArrayList<Double> outputs;
-	private ArrayList<TrainingInstance> trainSet;
+	//makes a training instance, rather than reading in all the data at once
+        private ArrayList<TrainingInstance> trainSet;
 	private double avgError = 0; 
 
 	public Chromosome(FeedForwardANN net, ArrayList<TrainingInstance> trainingSet) {
