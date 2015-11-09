@@ -277,48 +277,48 @@ public class RunModels {
 
             writer.close();
         } else if (choice.equals("de")) {
-//            System.out.println("Training with Differential Evolution");
-//            // gets the os for the computer this program is run on
-//            String os = System.getProperty("os.name").toLowerCase();
-//            // gets the home location
-//            String home = System.getProperty("user.home");
-//            // starts building the file path
-//            String filePathTrain = home;
-//            String filePathTest = home;
-//            String keyWord = "";
-//            //String to hold the filepath of the entire dataset
-//            String filePathOut = "";
+            System.out.println("Training with Differential Evolution");
+            // gets the os for the computer this program is run on
+            String os = System.getProperty("os.name").toLowerCase();
+            // gets the home location
+            String home = System.getProperty("user.home");
+            // starts building the file path
+            String filePathTrain = home;
+            String filePathTest = home;
+            String keyWord = "";
+            //String to hold the filepath of the entire dataset
+            String filePathOut = "";
 //
-//            // uses file separator so is operating system agnostic
-//            if (os.startsWith("windows")) { // Windows
-//                filePathTrain += File.separator;
-//                filePathTest += File.separator;
-//                filePathOut += File.separator;
-//            } else if (os.startsWith("mac")) { // Mac
-//                filePathTrain += File.separator;
-//                filePathTest += File.separator;
-//                filePathOut += File.separator;
-//            } else {
-//                // everything else
-//                filePathTrain += File.separator;
-//                filePathTest += File.separator;
-//                filePathOut += File.separator;
-//            }
+            // uses file separator so is operating system agnostic
+            if (os.startsWith("windows")) { // Windows
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else if (os.startsWith("mac")) { // Mac
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            } else {
+                // everything else
+                filePathTrain += File.separator;
+                filePathTest += File.separator;
+                filePathOut += File.separator;
+            }
 //
-//            // calls the file chooser, returns the updated file path
-//            System.out.println("Select Training Data Location");
-//            filePathTrain = callFileChooser(filePathTrain);
-//            System.out.println("Training Data: " + filePathTrain);
-//            System.out.println("Select Test Data Location");
-//            filePathTest = callFileChooser(filePathTest);
-//            System.out.println("Test Data: " + filePathTest);
-//
-//            System.out.println("Enter the keyword you would like to use to label your output files.");
-//            keyWord = in.nextLine();
-//
-//            System.out.println("Select location where you would like to save your output files.");
-//
-//            String filePathOut1 = getFileLocation();
+            // calls the file chooser, returns the updated file path
+            System.out.println("Select Training Data Location");
+            filePathTrain = callFileChooser(filePathTrain);
+            System.out.println("Training Data: " + filePathTrain);
+            System.out.println("Select Test Data Location");
+            filePathTest = callFileChooser(filePathTest);
+            System.out.println("Test Data: " + filePathTest);
+
+            System.out.println("Enter the keyword you would like to use to label your output files.");
+            keyWord = in.nextLine();
+
+            System.out.println("Select location where you would like to save your output files.");
+
+            String filePathOut1 = getFileLocation();
 //
 //            int[] popsize = {50, 100, 250, 500};
 //            double[] betas = {1, 5, 10, 25};//gotta be honest, I have no idea what a good range is for this
@@ -327,41 +327,41 @@ public class RunModels {
 //                for (int k = 0; k < betas.length; k++) {
 //                    for (int l = 0; l < prs.length; l++) {
 //
-//                        filePathOut = filePathOut1 + File.separator + keyWord + j + "" + k + "" + l + "DEOut.txt";
-//                        System.out.println("Output Data: " + filePathOut);
-//                        ArrayList<TrainingInstance> trainData = createTrainingInstance(filePathTrain);
-//                        ArrayList<TrainingInstance> testData = createTrainingInstance(filePathTest);
-//                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false);
-//
-//                        DifferentialEvolution de = new DifferentialEvolution(1000, popsize[j], betas[k], prs[l], net, trainData, filePathOut);
-//                        net = de.run(0.001);
-//                        ArrayList<Double> error = runTestData(testData, net);
-//
-//                        PrintWriter printWriter = null;
-//
-//                        File file = new File(filePathOut);
-//
-//                        try {
-//                            if (!file.exists()) {
-//                                file.createNewFile();
-//                            }
-//                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
-//                            printWriter.append("Begin test data");
-//                            for (int i = 0; i < error.size(); i++) {
-//                                printWriter.append("Test instance: " + i + ", error: " + error.get(i));
-//                                printWriter.println();
-//                            }
-//
-//                        } catch (IOException ioex) {
-//                            ioex.printStackTrace();
-//                        } finally {
-//                            if (printWriter != null) {
-//                                printWriter.flush();
-//                                printWriter.close();
-//                            }
-//                        }
-//
-//                        System.out.println("Generations: " + de.genCount);
+                        filePathOut = filePathOut1 + File.separator + keyWord + "DEOut.txt";
+                        System.out.println("Output Data: " + filePathOut);
+                        ArrayList<TrainingInstance> trainData = normalizeTrainOutputs(createTrainingInstance(filePathTrain));
+                        ArrayList<TrainingInstance> testData = normalizeTrainOutputs(createTrainingInstance(filePathTest));
+                        FeedForwardANN net = new FeedForwardANN(2, 5, trainData.get(0).getInputs(), trainData.get(0).getOutput(), true, false, 0.6);
+
+                        DifferentialEvolution de = new DifferentialEvolution(500, 50, 1, 0.05, net, trainData, filePathOut);
+                        net = de.run(0.05);
+                        ArrayList<Double> error = runTestData(testData, net);
+
+                        PrintWriter printWriter = null;
+
+                        File file = new File(filePathOut);
+
+                        try {
+                            if (!file.exists()) {
+                                file.createNewFile();
+                            }
+                            printWriter = new PrintWriter(new FileOutputStream(filePathOut, true));
+                            //printWriter.append("Begin test data");
+                            for (int i = 0; i < error.size(); i++) {
+                                printWriter.append(""+error.get(i));
+                                printWriter.println();
+                            }
+
+                        } catch (IOException ioex) {
+                            ioex.printStackTrace();
+                        } finally {
+                            if (printWriter != null) {
+                                printWriter.flush();
+                                printWriter.close();
+                            }
+                        }
+
+                        System.out.println("Generations: " + de.genCount);
 //                    }
 //                }
 //            }
