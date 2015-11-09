@@ -75,21 +75,22 @@ public class DifferentialEvolution extends TrainingStrategy {
 
         if (choice.equals("y")) {
             writer.write("population size: " + popSize + ", beta: "+ beta + ", Pr: " + pr);
-            writer.write("Initial fitness: " + best.getFitness());
-            writer.println();
-            writer.write("Initial error: " + err);
-            writer.println();
+            writer.close();
+//            writer.write("Initial fitness: " + best.getFitness());
+//            writer.println();
+//            writer.write("Initial error: " + err);
+//            writer.println();
         }
 
         genCount = 0;
         while (err > conf && genCount < gens) {
-            if (choice.equals("y")) {
-                // outputs the fitness and error at each generation
-                writer.write("Fitness at generation " + genCount + " :" + best.getFitness());
-                writer.println();
-                writer.write("Error at generation " + genCount + " :" + err);
-                writer.println();
-            }
+//            if (choice.equals("y")) {
+//                // outputs the fitness and error at each generation
+//                writer.write("Fitness at generation " + genCount + " :" + best.getFitness());
+//                writer.println();
+//                writer.write("Error at generation " + genCount + " :" + err);
+//                writer.println();
+//            }
 
             //generate a child for each member of the population
             for (int p = 0; p < popSize; p++) {
@@ -111,26 +112,28 @@ public class DifferentialEvolution extends TrainingStrategy {
                 }
             }
            best = returnBest();
+           best.evaluate();
            err = best.getAvgError();
             genCount++;
         }
         //return the best individual
         best = returnBest();
+        best.evaluate();
         System.out.println("--------------- FINISHED!---------------");
         System.out.println("Final fitness: " + best.getFitness());
         System.out.println("Final error: " + best.getAvgError());
 
-        best.evaluate();
         
-        if (choice.equals("y")) {
-            writer.write("Final fitness: " + best.getFitness());
-            writer.println();
-            writer.write("Final error: " + best.getAvgError());
-            writer.println();
-            writer.write("Training completed");
-            writer.println();
-            writer.close();
-        }
+        
+//        if (choice.equals("y")) {
+//            writer.write("Final fitness: " + best.getFitness());
+//            writer.println();
+//            writer.write("Final error: " + best.getAvgError());
+//            writer.println();
+//            writer.write("Training completed");
+//            writer.println();
+//            writer.close();
+//        }
 
         return net;
 

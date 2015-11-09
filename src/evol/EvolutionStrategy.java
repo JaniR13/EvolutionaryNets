@@ -88,23 +88,23 @@ public class EvolutionStrategy extends TrainingStrategy {
         System.out.println("Initial error: " + err);
 
         if (choice.equals("y")) {
-            writer.write("Initial fitness: " + best.getFitness());
-            writer.println();
-            writer.write("Initial error: " + err);
-            writer.println();
+            writer.write("mu: " + mu + ", lambda: "+ lambda + ", rho: " + rho);
+            writer.close();
+//            writer.write("Initial error: " + err);
+//            writer.println();
         }
 
         genCount = 0;
         //Array of size rho for the making children
         ESChromosome[] pool = new ESChromosome[rho];
         while (err > conf && genCount < gens) {
-            if (choice.equals("y")) {
-                // outputs the fitness and error at each generation
-                writer.write("Fitness at generation " + genCount + " :" + best.getFitness());
-                writer.println();
-                writer.write("Error at generation " + genCount + " :" + err);
-                writer.println();
-            }
+//            if (choice.equals("y")) {
+//                // outputs the fitness and error at each generation
+//                writer.write("Fitness at generation " + genCount + " :" + best.getFitness());
+//                writer.println();
+//                writer.write("Error at generation " + genCount + " :" + err);
+//                writer.println();
+//            }
 
             // runs for specified number of generations
             // for (int g = 0; g < gens; g++) {
@@ -137,15 +137,15 @@ public class EvolutionStrategy extends TrainingStrategy {
         System.out.println("Final error: " + best.getAvgError());
         best.evaluateFitness();
         
-        if (choice.equals("y")) {
-            writer.write("Final fitness: " + best.getFitness());
-            writer.println();
-            writer.write("Final error: " + best.getAvgError());
-            writer.println();
-            writer.write("Training completed");
-            writer.println();
-            writer.close();
-        }
+//        if (choice.equals("y")) {
+//            writer.write("Final fitness: " + best.getFitness());
+//            writer.println();
+//            writer.write("Final error: " + best.getAvgError());
+//            writer.println();
+//            writer.write("Training completed");
+//            writer.println();
+//            writer.close();
+//        }
 
         return net;
     }
